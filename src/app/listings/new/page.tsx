@@ -14,9 +14,7 @@ export default function NewListingPage() {
 
   useEffect(() => {
     supabaseBrowser.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        router.push("/login")
-      }
+      if (!data.session) router.push("/login")
     })
   }, [])
 
@@ -73,150 +71,203 @@ export default function NewListingPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-1">Post a listing</h1>
-      <p className="text-sm text-gray-400 mb-8">Fill in the details below to list your property on Aqari.</p>
+    <div style={{ background: "#E8F8F3", minHeight: "100vh" }}>
+      <div className="max-w-2xl mx-auto px-4 py-10">
 
-      {error && (
-        <div className="mb-6 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{error}</div>
-      )}
+        <a href="/listings" style={{ color: "#1D9E75" }} className="text-sm flex items-center gap-1 mb-6">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to listings
+        </a>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <h1 style={{ color: "#0A5C46" }} className="text-2xl font-semibold mb-1">Post a listing</h1>
+        <p style={{ color: "#1D9E75" }} className="text-sm mb-8">Fill in the details below to list your property on Aqari.</p>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Listing type</label>
-          <div className="flex gap-3">
-            {["rent", "sale"].map(type => (
-              <label key={type} className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="listing_type" value={type} defaultChecked={type === "rent"} className="accent-emerald-600" />
-                <span className="text-sm text-gray-700 capitalize">For {type}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        {error && (
+          <div className="mb-6 p-3 rounded-lg text-sm" style={{ background: "#B2F0DC", color: "#0A5C46" }}>{error}</div>
+        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-          <input
-            name="title"
-            required
-            placeholder="e.g. Spacious 2BR apartment in Salmiya"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea
-            name="description"
-            rows={3}
-            placeholder="Describe the property..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Price (KWD)</label>
-          <input
-            name="price"
-            type="number"
-            required
-            min={0}
-            placeholder="e.g. 350"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
-          <select
-            name="area"
-            required
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-          >
-            <option value="">Select an area</option>
-            {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Property type</label>
-          <select
-            name="property_type"
-            required
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-          >
-            <option value="">Select a type</option>
-            {PROPERTY_TYPES.map(t => (
-              <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+          {/* Listing type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Listing type</label>
+            <div className="flex gap-3">
+              {["rent", "sale"].map(type => (
+                <label key={type} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="listing_type" value={type} defaultChecked={type === "rent"} className="accent-emerald-600" />
+                  <span style={{ color: "#0A5C46" }} className="text-sm capitalize">For {type}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Title */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Title</label>
+            <input
+              name="title"
+              required
+              placeholder="e.g. Spacious 2BR apartment in Salmiya"
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Description</label>
+            <textarea
+              name="description"
+              rows={3}
+              placeholder="Describe the property..."
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none resize-none"
+            />
+          </div>
+
+          {/* Price */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Price (KWD)</label>
+            <input
+              name="price"
+              type="number"
+              required
+              min={0}
+              placeholder="e.g. 350"
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+            />
+          </div>
+
+          {/* Area */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Area</label>
             <select
-              name="bedrooms"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+              name="area"
+              required
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
             >
-              <option value="">-</option>
-              <option value="0">Studio</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5+</option>
+              <option value="">Select an area</option>
+              {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
           </div>
+
+          {/* Property type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Property type</label>
             <select
-              name="bathrooms"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+              name="property_type"
+              required
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
             >
-              <option value="">-</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4+</option>
+              <option value="">Select a type</option>
+              {PROPERTY_TYPES.map(t => (
+                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+              ))}
             </select>
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
-          <input
-            name="phone_number"
-            required
-            placeholder="e.g. +965 9999 9999"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
-        </div>
+          {/* Bedrooms & Bathrooms */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Bedrooms</label>
+              <select
+                name="bedrooms"
+                style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+                className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+              >
+                <option value="">-</option>
+                <option value="0">Studio</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5+</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Bathrooms</label>
+              <select
+                name="bathrooms"
+                style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+                className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+              >
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4+</option>
+              </select>
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Photos</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={e => setPhotos(Array.from(e.target.files ?? []))}
-            className="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
-          />
-          {photos.length > 0 && (
-            <p className="text-xs text-gray-400 mt-1">{photos.length} photo{photos.length > 1 ? "s" : ""} selected</p>
-          )}
-        </div>
+          {/* Phone */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Phone number</label>
+            <input
+              name="phone_number"
+              required
+              placeholder="e.g. +965 9999 9999"
+              style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+              className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-emerald-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 mt-2"
-        >
-          {loading ? "Posting..." : "Post listing"}
-        </button>
+          {/* Photos */}
+          <div>
+            <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">
+              Photos <span style={{ color: "#1D9E75" }} className="font-normal text-xs">(select multiple)</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={e => setPhotos(Array.from(e.target.files ?? []))}
+              className="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-medium"
+              style={{ color: "#1D9E75" }}
+            />
+            {photos.length > 0 && (
+              <div className="mt-2">
+                <p className="text-xs mb-2" style={{ color: "#1D9E75" }}>{photos.length} photo{photos.length > 1 ? "s" : ""} selected</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {photos.map((file, i) => (
+                    <div key={i} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`preview ${i}`}
+                        className="w-full h-20 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPhotos(photos.filter((_, j) => j !== i))}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: "#0A5C46", color: "#7FEDD0" }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
-      </form>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ background: "#0F7A5F", color: "#7FEDD0" }}
+            className="w-full rounded-lg py-3 text-sm font-medium disabled:opacity-50 mt-2"
+          >
+            {loading ? "Posting..." : "Post listing"}
+          </button>
+
+        </form>
+      </div>
     </div>
   )
 }

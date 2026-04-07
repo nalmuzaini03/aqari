@@ -28,9 +28,14 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         </Link>
 
         {listing.photos && listing.photos.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden mb-6">
-            {listing.photos.slice(0, 4).map((url: string, i: number) => (
-              <img key={i} src={url} alt={listing.title} className="w-full h-56 object-cover" />
+          <div className={`grid gap-2 rounded-2xl overflow-hidden mb-6 ${listing.photos.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+            {listing.photos.slice(0, 6).map((url: string, i: number) => (
+              <img
+                key={i}
+                src={url}
+                alt={listing.title}
+                className={`w-full object-cover ${listing.photos.length === 1 ? "h-72" : "h-48"}`}
+              />
             ))}
           </div>
         ) : (
