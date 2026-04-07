@@ -31,12 +31,16 @@ export default function FiltersBar({
   const priceRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleClick(e: MouseEvent | TouchEvent) {
       if (areaRef.current && !areaRef.current.contains(e.target as Node)) setAreaOpen(false)
       if (priceRef.current && !priceRef.current.contains(e.target as Node)) setPriceOpen(false)
     }
     document.addEventListener("mousedown", handleClick)
-    return () => document.removeEventListener("mousedown", handleClick)
+    document.addEventListener("touchstart", handleClick)
+    return () => {
+      document.removeEventListener("mousedown", handleClick)
+      document.removeEventListener("touchstart", handleClick)
+    }
   }, [])
 
   function pushParams(overrides: Record<string, string | string[]>) {
@@ -97,114 +101,130 @@ export default function FiltersBar({
   }
 
   const selectStyle = { background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }
-  const selectClass = "text-sm border rounded-full px-3 py-1.5 font-medium cursor-pointer focus:outline-none whitespace-nowrap"
+  const selectClass = "text-sm border rounded-full px-3 py-1.5 font-medium cursor-pointer focus:outline-none w-full"
   const priceLabel = currentMaxPrice ? `Up to ${Number(currentMaxPrice).toLocaleString()} KWD` : "Max price"
 
   return (
-    <div style={{ background: "#0F7A5F" }} className="sticky top-0 z-10">
-      <div className="flex items-center justify-between px-4 py-3 gap-3">
-        {/* Scrollable filters */}
-        <div className="flex gap-2 overflow-x-auto pb-1 flex-1" style={{ scrollbarWidth: "none" }}>
+    <div style={{ background: "#0F7A5F" }} className="sticky top-0 z-10 px-4 py-3">
 
-          <select
-            value={currentListingType}
-            onChange={e => updateSingle("listing_type", e.target.value)}
+      {/* Filter grid — 3 cols on mobile, all in one row on desktop */}
+      <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 mb-2 sm:mb-0">
+
+        <select
+          value={currentListingType}
+          onChange={e => updateSingle("listing_type", e.target.value)}
+          style={selectStyle}
+          className={selectClass}
+        >
+          <option value="">All types</option>
+          <option value="rent">For rent</option>
+          <option value="sale">For sale</option>
+        </select>
+
+        <select
+          value={currentPropertyType}
+          onChange={e => updateSingle("property_type", e.target.value)}
+          style={selectStyle}
+          className={selectClass}
+        >
+          <option value="">Property type</option>
+          {propertyTypes.map(t => (
+            <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+          ))}
+        </select>
+
+        <select
+          value={currentBedrooms}
+          onChange={e => updateSingle("bedrooms", e.target.value)}
+          style={selectStyle}
+          className={selectClass}
+        >
+          <option value="">Bedrooms</option>
+          <option value="0">Studio</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4+</option>
+        </select>
+
+        {/* Areas */}
+        <div ref={areaRef} className="relative">
+          <button
+            onClick={() => { setAreaOpen(!areaOpen); setPriceOpen(false) }}
             style={selectStyle}
-            className={selectClass}
+            className="text-sm border rounded-full px-3 py-1.5 font-medium cursor-pointer focus:outline-none w-full flex items-center justify-between gap-1"
           >
-            <option value="">All types</option>
-            <option value="rent">For rent</option>
-            <option value="sale">For sale</option>
-          </select>
-
-          <div ref={areaRef} className="relative flex-shrink-0">
-            <button
-              onClick={() => setAreaOpen(!areaOpen)}
-              style={selectStyle}
-              className={`${selectClass} flex items-center gap-1.5`}
-            >
+            <span className="truncate">
               {localAreas.length === 0 ? "All areas" : localAreas.length === 1 ? localAreas[0] : `${localAreas.length} areas`}
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {areaOpen && (
-              <div style={{ background: "#0D6B52", border: "1px solid #1D9E75" }} className="absolute top-full mt-1 left-0 rounded-xl shadow-lg z-50 w-56 max-h-64 overflow-y-auto">
-                {localAreas.length > 0 && (
-                  <button onClick={clearAreas} style={{ color: "#7FEDD0", borderBottom: "1px solid #1D9E75" }} className="w-full text-left px-4 py-2 text-xs">
-                    Clear all areas
-                  </button>
-                )}
-                {areas.map(area => (
-                  <label key={area} style={{ color: "#7FEDD0" }} className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:opacity-80">
-                    <input type="checkbox" checked={localAreas.includes(area)} onChange={() => toggleArea(area)} className="accent-emerald-400" />
-                    {area}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+            </span>
+            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {areaOpen && (
+            <div style={{ background: "#0D6B52", border: "1px solid #1D9E75" }} className="absolute top-full mt-1 left-0 rounded-xl shadow-lg z-50 w-56 max-h-64 overflow-y-auto">
+              {localAreas.length > 0 && (
+                <button onClick={clearAreas} style={{ color: "#7FEDD0", borderBottom: "1px solid #1D9E75" }} className="w-full text-left px-4 py-2 text-xs">
+                  Clear all areas
+                </button>
+              )}
+              {areas.map(area => (
+                <label key={area} style={{ color: "#7FEDD0" }} className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:opacity-80">
+                  <input type="checkbox" checked={localAreas.includes(area)} onChange={() => toggleArea(area)} className="accent-emerald-400" />
+                  {area}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
 
-          <select
-            value={currentPropertyType}
-            onChange={e => updateSingle("property_type", e.target.value)}
+        {/* Price */}
+        <div ref={priceRef} className="relative">
+          <button
+            onClick={() => { setPriceOpen(!priceOpen); setAreaOpen(false) }}
             style={selectStyle}
-            className={selectClass}
+            className="text-sm border rounded-full px-3 py-1.5 font-medium cursor-pointer focus:outline-none w-full flex items-center justify-between gap-1"
           >
-            <option value="">Property type</option>
-            {propertyTypes.map(t => (
-              <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-            ))}
-          </select>
-
-          <select
-            value={currentBedrooms}
-            onChange={e => updateSingle("bedrooms", e.target.value)}
-            style={selectStyle}
-            className={selectClass}
-          >
-            <option value="">Bedrooms</option>
-            <option value="0">Studio</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4+</option>
-          </select>
-
-          <div ref={priceRef} className="relative flex-shrink-0">
-            <button
-              onClick={() => setPriceOpen(!priceOpen)}
-              style={selectStyle}
-              className={`${selectClass} flex items-center gap-1.5`}
-            >
-              {priceLabel}
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {priceOpen && (
-              <div style={{ background: "#0D6B52", border: "1px solid #1D9E75" }} className="absolute top-full mt-1 left-0 rounded-xl shadow-lg z-50 w-72 p-5">
-                <p style={{ color: "#7FEDD0" }} className="text-sm font-medium mb-1">Max price</p>
-                <p style={{ color: "#B2F0DC" }} className="text-2xl font-semibold mb-4">{sliderValue.toLocaleString()} KWD</p>
-                <input type="range" min={50} max={10000} step={50} value={sliderValue} onChange={e => setSliderValue(Number(e.target.value))} className="w-full" style={{ accentColor: "#7FEDD0" }} />
-                <div className="flex justify-between mt-1 mb-4">
-                  <span style={{ color: "#B2F0DC" }} className="text-xs">50 KWD</span>
-                  <span style={{ color: "#B2F0DC" }} className="text-xs">10,000 KWD</span>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={clearPrice} style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }} className="flex-1 py-2 rounded-lg text-sm">Clear</button>
-                  <button onClick={applyPrice} style={{ background: "#7FEDD0", color: "#0A5C46" }} className="flex-1 py-2 rounded-lg text-sm font-medium">Apply</button>
-                </div>
+            <span className="truncate">{priceLabel}</span>
+            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {priceOpen && (
+            <div style={{ background: "#0D6B52", border: "1px solid #1D9E75" }} className="absolute top-full mt-1 left-0 rounded-xl shadow-lg z-50 w-72 p-5">
+              <p style={{ color: "#7FEDD0" }} className="text-sm font-medium mb-1">Max price</p>
+              <p style={{ color: "#B2F0DC" }} className="text-2xl font-semibold mb-4">{sliderValue.toLocaleString()} KWD</p>
+              <input
+                type="range"
+                min={50}
+                max={10000}
+                step={50}
+                value={sliderValue}
+                onChange={e => setSliderValue(Number(e.target.value))}
+                className="w-full"
+                style={{ accentColor: "#7FEDD0" }}
+              />
+              <div className="flex justify-between mt-1 mb-4">
+                <span style={{ color: "#B2F0DC" }} className="text-xs">50 KWD</span>
+                <span style={{ color: "#B2F0DC" }} className="text-xs">10,000 KWD</span>
               </div>
-            )}
-          </div>
-
+              <div className="flex gap-2">
+                <button onClick={clearPrice} style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }} className="flex-1 py-2 rounded-lg text-sm">Clear</button>
+                <button onClick={applyPrice} style={{ background: "#7FEDD0", color: "#0A5C46" }} className="flex-1 py-2 rounded-lg text-sm font-medium">Apply</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Post button */}
-        <a href="/login" style={{ background: "#7FEDD0", color: "#0A5C46" }} className="text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0">
+        <a
+          href="/login"
+          style={{ background: "#7FEDD0", color: "#0A5C46" }}
+          className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center"
+        >
           + Post
         </a>
+
       </div>
     </div>
   )
