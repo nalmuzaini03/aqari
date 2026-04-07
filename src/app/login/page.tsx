@@ -12,54 +12,47 @@ export default function LoginPage() {
   async function sendMagicLink() {
     setLoading(true)
     setError(null)
-
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: "http://localhost:3000/auth/callback",
+        emailRedirectTo: "https://getaqari.com/auth/callback",
         shouldCreateUser: true,
       },
     })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      setSent(true)
-    }
+    if (error) setError(error.message)
+    else setSent(true)
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 p-8">
-
+    <div style={{ background: "#E8F8F3" }} className="min-h-screen flex items-center justify-center px-4">
+      <div style={{ background: "#C8F5E8", border: "1px solid #9FE1CB" }} className="w-full max-w-sm rounded-2xl p-8">
         {!sent ? (
           <>
-            <div className="mb-8">
-              <h1 className="text-2xl font-semibold text-gray-900">Sign in to Aqari</h1>
-              <p className="text-sm text-gray-400 mt-1">Enter your email to continue</p>
-            </div>
+            <h1 style={{ color: "#0A5C46" }} className="text-2xl font-semibold mb-1">Sign in to Aqari</h1>
+            <p style={{ color: "#1D9E75" }} className="text-sm mb-8">Enter your email to continue</p>
 
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{error}</div>
+              <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: "#B2F0DC", color: "#0A5C46" }}>{error}</div>
             )}
 
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Email address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }}
+                  className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
                 />
               </div>
-
               <button
                 onClick={sendMagicLink}
                 disabled={loading || email.length < 5}
-                className="w-full bg-emerald-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                style={{ background: "#0F7A5F", color: "#7FEDD0" }}
+                className="w-full rounded-lg py-2.5 text-sm font-medium disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Send login link"}
               </button>
@@ -67,17 +60,14 @@ export default function LoginPage() {
           </>
         ) : (
           <div className="text-center">
-            <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div style={{ background: "#1D9E75" }} className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Check your email</h2>
-            <p className="text-sm text-gray-400">We sent a login link to<br /><span className="text-gray-600 font-medium">{email}</span></p>
-            <button
-              onClick={() => setSent(false)}
-              className="mt-6 text-sm text-gray-400 hover:text-gray-600"
-            >
+            <h2 style={{ color: "#0A5C46" }} className="text-lg font-semibold mb-1">Check your email</h2>
+            <p style={{ color: "#1D9E75" }} className="text-sm">We sent a login link to<br /><span style={{ color: "#0A5C46" }} className="font-medium">{email}</span></p>
+            <button onClick={() => setSent(false)} style={{ color: "#1D9E75" }} className="mt-6 text-sm">
               Use a different email
             </button>
           </div>
@@ -86,3 +76,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

@@ -18,13 +18,16 @@ export default function FiltersBar({ areas, propertyTypes, current }: Props) {
     router.push(`${pathname}?${params.toString()}`)
   }
 
+  const selectClass = "text-sm border rounded-full px-3 py-1.5 font-medium cursor-pointer focus:outline-none"
+
   return (
-    <div className="flex flex-wrap gap-2 p-4 bg-white border-b border-gray-100 sticky top-0 z-10 items-center justify-between">
+    <div style={{ background: "#0F7A5F" }} className="flex flex-wrap gap-2 p-4 sticky top-0 z-10 items-center justify-between">
       <div className="flex flex-wrap gap-2">
         <select
           defaultValue={current.listing_type ?? ""}
           onChange={e => update("listing_type", e.target.value)}
-          className="text-sm border rounded-full px-3 py-1.5 bg-gray-50"
+          style={{ background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }}
+          className={selectClass}
         >
           <option value="">All types</option>
           <option value="rent">For rent</option>
@@ -34,31 +37,30 @@ export default function FiltersBar({ areas, propertyTypes, current }: Props) {
         <select
           defaultValue={current.area ?? ""}
           onChange={e => update("area", e.target.value)}
-          className="text-sm border rounded-full px-3 py-1.5 bg-gray-50"
+          style={{ background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }}
+          className={selectClass}
         >
           <option value="">All areas</option>
-          {areas.map(a => (
-            <option key={a} value={a}>{a}</option>
-          ))}
+          {areas.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
 
         <select
           defaultValue={current.property_type ?? ""}
           onChange={e => update("property_type", e.target.value)}
-          className="text-sm border rounded-full px-3 py-1.5 bg-gray-50"
+          style={{ background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }}
+          className={selectClass}
         >
           <option value="">Property type</option>
           {propertyTypes.map(t => (
-            <option key={t} value={t}>
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </option>
+            <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
           ))}
         </select>
 
         <select
           defaultValue={current.bedrooms ?? ""}
           onChange={e => update("bedrooms", e.target.value)}
-          className="text-sm border rounded-full px-3 py-1.5 bg-gray-50"
+          style={{ background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }}
+          className={selectClass}
         >
           <option value="">Bedrooms</option>
           <option value="0">Studio</option>
@@ -71,7 +73,8 @@ export default function FiltersBar({ areas, propertyTypes, current }: Props) {
         <select
           defaultValue={current.max_price ?? ""}
           onChange={e => update("max_price", e.target.value)}
-          className="text-sm border rounded-full px-3 py-1.5 bg-gray-50"
+          style={{ background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }}
+          className={selectClass}
         >
           <option value="">Max price</option>
           <option value="200">200 KWD</option>
@@ -85,11 +88,12 @@ export default function FiltersBar({ areas, propertyTypes, current }: Props) {
 
       <a
         href="/login"
-        className="text-sm bg-emerald-600 text-white px-4 py-1.5 rounded-full hover:bg-emerald-700 transition-colors"
+        style={{ background: "#7FEDD0", color: "#0A5C46" }}
+        className="text-sm font-medium px-4 py-1.5 rounded-full"
       >
         + Post a listing
       </a>
     </div>
-    
   )
 }
+
