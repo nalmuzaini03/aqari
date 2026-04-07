@@ -4,7 +4,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
 
-      {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100">
         <div className="text-xl font-semibold tracking-tight">
           aq<span className="text-emerald-600">a</span>ri
@@ -17,7 +16,6 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="bg-emerald-50 px-6 py-20 text-center">
         <span className="inline-block bg-white text-emerald-700 text-xs px-3 py-1 rounded-full border border-emerald-200 mb-6">
           Kuwait's property marketplace · سوق العقارات في الكويت
@@ -41,7 +39,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="flex justify-center gap-16 py-10 bg-white border-b border-gray-100">
         <div className="text-center">
           <p className="text-2xl font-semibold text-gray-900">500+</p>
@@ -57,30 +54,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="px-6 py-16 bg-white">
         <h2 className="text-2xl font-semibold text-center text-gray-900 mb-1">Why Aqari?</h2>
         <p className="text-center text-emerald-600 mb-10 text-sm" dir="rtl">لماذا عقاري؟</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {[
-            {
-              title: "Verified listings",
-              ar: "إعلانات موثقة",
-              desc: "Every listing is reviewed for accuracy and legitimacy.",
-            },
-            {
-              title: "WhatsApp contact",
-              ar: "تواصل عبر واتساب",
-              desc: "Connect directly with landlords via WhatsApp instantly.",
-            },
-            {
-              title: "All of Kuwait",
-              ar: "كل الكويت",
-              desc: "Listings across all 6 governorates and popular areas.",
-            },
+            { title: "Verified listings", ar: "إعلانات موثقة", desc: "Every listing is reviewed for accuracy and legitimacy." },
+            { title: "WhatsApp contact", ar: "تواصل عبر واتساب", desc: "Connect directly with landlords via WhatsApp instantly." },
+            { title: "All of Kuwait", ar: "كل الكويت", desc: "Listings across all 6 governorates and popular areas." },
           ].map((f) => (
             <div key={f.title} className="bg-gray-50 rounded-xl p-5">
-              <div className="w-8 h-8 bg-emerald-100 rounded-lg mb-3" />
               <h3 className="text-sm font-medium text-gray-900 mb-0.5">{f.title}</h3>
               <p className="text-xs text-emerald-600 mb-2" dir="rtl">{f.ar}</p>
               <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
@@ -89,7 +72,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="px-6 py-16 bg-gray-50">
         <h2 className="text-2xl font-semibold text-center text-gray-900 mb-1">How it works</h2>
         <p className="text-center text-emerald-600 mb-10 text-sm" dir="rtl">كيف يعمل؟</p>
@@ -110,7 +92,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="bg-emerald-900 px-6 py-16 text-center">
         <h2 className="text-2xl font-semibold text-white mb-2">Ready to list your property?</h2>
         <p className="text-emerald-400 text-sm mb-8" dir="rtl">هل أنت مستعد لنشر عقارك؟</p>
@@ -124,7 +105,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-6 text-center text-xs text-gray-400 border-t border-gray-100">
         © 2026 Aqari · getaqari.com · Kuwait
       </footer>
