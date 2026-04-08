@@ -68,7 +68,6 @@ export default function DashboardPage() {
   return (
     <div style={{ background: "#F7F7F7", minHeight: "100vh" }}>
 
-      {/* Nav */}
       <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
@@ -84,7 +83,6 @@ export default function DashboardPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-10">
 
-        {/* Header */}
         <div className="mb-8">
           <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#222", letterSpacing: "-0.5px" }}>
             Welcome back, {userName} 👋
@@ -105,7 +103,6 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
                 { label: "Total views", value: totalViews.toLocaleString(), icon: "👁" },
@@ -121,7 +118,6 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* Listings performance */}
             <div style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px", overflow: "hidden", marginBottom: "16px" }}>
               <div style={{ padding: "20px 24px", borderBottom: "1px solid #EBEBEB", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <p style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>Listing performance</p>
@@ -133,7 +129,6 @@ export default function DashboardPage() {
                   <div key={listing.id} style={{ padding: "16px 24px", borderBottom: i < stats.length - 1 ? "1px solid #EBEBEB" : "none" }}>
                     <div className="flex items-center gap-4">
 
-                      {/* Thumbnail */}
                       <div style={{ borderRadius: "10px", background: "#F7F7F7", width: "56px", height: "56px", flexShrink: 0, overflow: "hidden" }}>
                         {listing.photos && listing.photos.length > 0 ? (
                           <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
@@ -146,7 +141,6 @@ export default function DashboardPage() {
                         )}
                       </div>
 
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
@@ -162,13 +156,11 @@ export default function DashboardPage() {
                           </span>
                           <span style={{ fontSize: "12px", color: "#717171" }}>{priceLabel(listing)} · {listing.area}</span>
                         </div>
-                        {/* Progress bar */}
                         <div style={{ background: "#F7F7F7", borderRadius: "99px", height: "4px" }}>
-                          <div style={{ background: "#FF385C", width: `${(listing.views / maxViews) * 100}%`, borderRadius: "99px", height: "4px", transition: "width 0.5s" }} />
+                          <div style={{ background: "#FF385C", width: `${(listing.views / maxViews) * 100}%`, borderRadius: "99px", height: "4px" }} />
                         </div>
                       </div>
 
-                      {/* Stats */}
                       <div className="flex gap-5 flex-shrink-0 text-center">
                         <div>
                           <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.views}</p>
@@ -180,12 +172,11 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex gap-2 flex-shrink-0">
                         <Link href={`/listings/${listing.id}`} style={{ fontSize: "12px", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
                           View
                         </Link>
-                        <Link href={`/my-listings`} style={{ fontSize: "12px", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
+                        <Link href="/my-listings" style={{ fontSize: "12px", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
                           Manage
                         </Link>
                       </div>
@@ -196,7 +187,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Quick actions */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
                 { href: "/listings/new", icon: "➕", title: "New listing", desc: "Post a property for free" },
@@ -210,7 +200,6 @@ export default function DashboardPage() {
                 </Link>
               ))}
             </div>
-
           </>
         )}
       </div>
