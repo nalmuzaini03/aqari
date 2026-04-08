@@ -4,18 +4,32 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase-browser"
 import Link from "next/link"
 
-export default function LoginPage() {
+export default function SignupPage() {
   const supabase = createClient()
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirm, setConfirm] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleLogin() {
+  async function handleSignup() {
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (password !== confirm) {
+      setError("Passwords do not match")
+      setLoading(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters")
+      setLoading(false)
+      return
+    }
+
+    const { error } = await supabase.auth.signUp({ email, password })
     if (error) setError(error.message)
     else router.push("/listings")
     setLoading(false)
@@ -33,10 +47,10 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <div style={{ width: "100%", maxWidth: "420px" }}>
           <h1 style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#1C3829", fontWeight: "400" }} className="mb-2">
-            Welcome back
+            Create an account
           </h1>
           <p style={{ fontSize: "14px", color: "#8C7B65" }} className="mb-8">
-            Sign in to your Aqari account
+            List your property on Aqari for free
           </p>
 
           {error && (
@@ -53,7 +67,6 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px" }}
                 className="w-full px-4 py-3 focus:outline-none"
-                onKeyDown={e => e.key === "Enter" && handleLogin()}
               />
             </div>
             <div>
@@ -62,25 +75,40 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
+                style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px" }}
+                className="w-full px-4 py-3 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: "12px", color: "#8C7B65", letterSpacing: "0.5px" }} className="block mb-2 uppercase">Confirm password</label>
+              <input
+                type="password"
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
                 placeholder="••••••••"
                 style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px" }}
                 className="w-full px-4 py-3 focus:outline-none"
-                onKeyDown={e => e.key === "Enter" && handleLogin()}
+                onKeyDown={e => e.key === "Enter" && handleSignup()}
               />
             </div>
             <button
-              onClick={handleLogin}
+              onClick={handleSignup}
               disabled={loading || email.length < 5 || password.length < 6}
               style={{ background: "#1C3829", color: "#FAF8F4", borderRadius: "4px", fontSize: "14px", border: "none", letterSpacing: "0.3px" }}
               className="w-full py-3 font-medium disabled:opacity-50"
             >
-              {loading ? "Signing in..." : "Sign in →"}
+              {loading ? "Creating account..." : "Create account →"}
             </button>
           </div>
 
           <p style={{ fontSize: "13px", color: "#8C7B65" }} className="mt-6 text-center">
-            Don't have an account?{" "}
-            <Link href="/signup" style={{ color: "#2D6A4F" }}>Sign up free</Link>
+            Already have an account?{" "}
+            <Link href="/login" style={{ color: "#2D6A4F" }}>Sign in</Link>
+          </p>
+
+          <p style={{ fontSize: "12px", color: "#B4A99A", textAlign: "center", marginTop: "16px", lineHeight: "1.5" }}>
+            By signing up you agree to Aqari's terms. Your account will be used to manage your listings.
           </p>
         </div>
       </div>

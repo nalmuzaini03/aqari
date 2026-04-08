@@ -14,7 +14,7 @@ export default function HomePage() {
           <Link href="/login" style={{ color: "#2D6A4F", border: "1.5px solid #2D6A4F", fontSize: "13px", letterSpacing: "0.3px" }} className="px-4 py-2 rounded">
             Log in
           </Link>
-          <Link href="/login" style={{ background: "#1C3829", color: "#FAF8F4", fontSize: "13px", letterSpacing: "0.3px" }} className="px-4 py-2 rounded font-medium">
+          <Link href="/signup" style={{ background: "#1C3829", color: "#FAF8F4", fontSize: "13px", letterSpacing: "0.3px" }} className="px-4 py-2 rounded font-medium">
             Sign up free
           </Link>
         </div>
