@@ -254,6 +254,13 @@ export default function FiltersBar({
             )}
           </button>
           <a
+            href="/dashboard"
+            style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }}
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center flex-1"
+          >
+            Dashboard
+          </a>
+          <a
             href="/my-listings"
             style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }}
             className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center flex-1"
