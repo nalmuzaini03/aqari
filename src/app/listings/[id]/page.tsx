@@ -4,6 +4,7 @@ import Link from "next/link"
 import DeleteButton from "@/components/DeleteButton"
 import ViewTracker from "@/components/ViewTracker"
 import WhatsAppButton from "@/components/WhatsAppButton"
+import ShortStayBooking from "@/components/ShortStayBooking"
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -12,6 +13,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
   const whatsappNumber = listing.phone_number.replace(/\D/g, "")
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=Hi, I'm interested in your listing: ${listing.title}`
+
+  const badgeLabel = listing.listing_type === "rent" ? "For rent" : listing.listing_type === "short_stay" ? "Short stay" : "For sale"
+  const badgeBg = listing.listing_type === "rent" ? "#FF385C" : listing.listing_type === "short_stay" ? "#7C3AED" : "#222"
 
   return (
     <div style={{ background: "white", minHeight: "100vh" }}>
@@ -53,13 +57,11 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
         {/* Main info card */}
         <div style={{ border: "1px solid #EBEBEB", borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
-
-          {/* Badges + title + price */}
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span style={{ background: listing.listing_type === "rent" ? "#FF385C" : "#222", color: "white", fontSize: "11px", letterSpacing: "0.5px", fontWeight: 600 }} className="px-2 py-0.5 rounded-md uppercase">
-                  {listing.listing_type === "rent" ? "For rent" : "For sale"}
+                <span style={{ background: badgeBg, color: "white", fontSize: "11px", letterSpacing: "0.5px", fontWeight: 600 }} className="px-2 py-0.5 rounded-md uppercase">
+                  {badgeLabel}
                 </span>
                 {listing.is_verified && (
                   <span style={{ background: "white", color: "#222", fontSize: "11px", fontWeight: 600, border: "1px solid #EBEBEB" }} className="px-2 py-0.5 rounded-md">
@@ -76,8 +78,17 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               </p>
             </div>
             <div className="text-right shrink-0">
-              <p style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "#222" }}>{listing.price.toLocaleString()} KWD</p>
-              {listing.listing_type === "rent" && <p style={{ fontSize: "13px", color: "#717171" }}>/ month</p>}
+              {listing.listing_type === "short_stay" ? (
+                <>
+                  <p style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "#222" }}>{(listing.price_per_night ?? listing.price).toLocaleString()} KWD</p>
+                  <p style={{ fontSize: "13px", color: "#717171" }}>/ night</p>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "#222" }}>{listing.price.toLocaleString()} KWD</p>
+                  {listing.listing_type === "rent" && <p style={{ fontSize: "13px", color: "#717171" }}>/ month</p>}
+                </>
+              )}
             </div>
           </div>
 
@@ -110,7 +121,17 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           )}
         </div>
 
-        <WhatsAppButton listingId={listing.id} whatsappLink={whatsappLink} phoneNumber={listing.phone_number} />
+        {/* Booking or WhatsApp */}
+        {listing.listing_type === "short_stay" ? (
+          <ShortStayBooking
+            listingId={listing.id}
+            phoneNumber={listing.phone_number}
+            title={listing.title}
+            pricePerNight={listing.price_per_night ?? listing.price}
+          />
+        ) : (
+          <WhatsAppButton listingId={listing.id} whatsappLink={whatsappLink} phoneNumber={listing.phone_number} />
+        )}
       </div>
     </div>
   )
