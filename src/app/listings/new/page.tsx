@@ -31,12 +31,19 @@ async function compressImage(file: File): Promise<File> {
   })
 }
 
+const LISTING_TYPES = [
+  { value: "rent", label: "For rent", desc: "Monthly rental" },
+  { value: "short_stay", label: "Short stay", desc: "Nightly / weekend" },
+  { value: "sale", label: "For sale", desc: "Property purchase" },
+]
+
 export default function NewListingPage() {
   const router = useRouter()
   const supabaseBrowser = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [photos, setPhotos] = useState<File[]>([])
+  const [listingType, setListingType] = useState("rent")
 
   useEffect(() => {
     supabaseBrowser.auth.getSession().then(({ data }) => {
@@ -71,17 +78,24 @@ export default function NewListingPage() {
     const listingId = crypto.randomUUID()
     const photoUrls = await uploadPhotos(listingId)
     const { data: { session } } = await supabaseBrowser.auth.getSession()
+
+    const pricePerNight = listingType === "short_stay" ? Number(data.get("price_per_night")) : null
+    const price = listingType === "short_stay"
+      ? (pricePerNight ?? 0)
+      : Number(data.get("price"))
+
     const { error } = await supabase.from("property_listings").insert({
       id: listingId,
       title: data.get("title"),
       description: data.get("description"),
-      price: Number(data.get("price")),
+      price,
+      price_per_night: pricePerNight,
       area: data.get("area"),
       bedrooms: data.get("bedrooms") ? Number(data.get("bedrooms")) : null,
       bathrooms: data.get("bathrooms") ? Number(data.get("bathrooms")) : null,
       property_type: data.get("property_type"),
       phone_number: data.get("phone_number"),
-      listing_type: data.get("listing_type"),
+      listing_type: listingType,
       photos: photoUrls,
       is_verified: false,
       user_id: session?.user.id ?? null,
@@ -90,60 +104,96 @@ export default function NewListingPage() {
     router.push("/my-listings")
   }
 
-  const inputStyle = { background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px", width: "100%", padding: "10px 14px" }
-  const labelStyle = { fontSize: "12px", color: "#8C7B65", letterSpacing: "0.5px", display: "block" as const, marginBottom: "6px" }
+  const inputStyle = {
+    background: "white", border: "1px solid #DDDDDD", color: "#222",
+    borderRadius: "8px", fontSize: "14px", width: "100%", padding: "12px 16px",
+  }
+  const labelStyle = {
+    fontSize: "12px", color: "#717171", letterSpacing: "0.5px",
+    fontWeight: 600, display: "block" as const, marginBottom: "6px",
+  }
 
   return (
-    <div style={{ background: "#FAF8F4", minHeight: "100vh" }}>
-      <nav style={{ background: "#FAF8F4", borderBottom: "1px solid #E8E0D0" }} className="flex items-center justify-between px-6 sm:px-12 py-5">
-        <Link href="/" style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#1C3829", letterSpacing: "3px" }}>
-          AQ<span style={{ color: "#2D6A4F" }}>A</span>RI
-        </Link>
-        <Link href="/listings" style={{ fontSize: "13px", color: "#6B5F50" }}>Browse listings</Link>
+    <div style={{ background: "white", minHeight: "100vh" }}>
+
+      {/* Nav */}
+      <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="flex items-center justify-between px-6 sm:px-10 py-4">
+        <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
+        <Link href="/listings" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", fontWeight: 500 }}>Browse listings</Link>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-10">
-        <Link href="/listings" style={{ color: "#8C7B65", fontSize: "13px" }} className="flex items-center gap-1 mb-8">
+
+        <Link href="/listings" style={{ color: "#717171", fontSize: "14px", textDecoration: "none" }} className="flex items-center gap-1 mb-8">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to listings
         </Link>
 
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#1C3829", fontWeight: "400" }} className="mb-1">Post a listing</h1>
-        <p style={{ fontSize: "14px", color: "#8C7B65" }} className="mb-8">Fill in the details below to list your property on Aqari.</p>
+        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#222", letterSpacing: "-0.5px" }} className="mb-1">Post a listing</h1>
+        <p style={{ fontSize: "15px", color: "#717171" }} className="mb-8">Fill in the details below to list your property on Aqari. It's free.</p>
 
-        {error && <div style={{ background: "#F2EDE4", border: "1px solid #E8E0D0", borderRadius: "4px", color: "#6B5F50", fontSize: "13px" }} className="mb-6 p-3">{error}</div>}
+        {error && (
+          <div style={{ background: "#FFF0F2", border: "1px solid #FFD6DF", borderRadius: "8px", color: "#C4001B", fontSize: "13px" }} className="mb-6 p-3">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
+          {/* Listing type */}
           <div>
             <label style={labelStyle}>LISTING TYPE</label>
-            <div className="flex gap-4">
-              {["rent", "sale"].map(type => (
-                <label key={type} className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="listing_type" value={type} defaultChecked={type === "rent"} />
-                  <span style={{ fontSize: "14px", color: "#1C3829" }} className="capitalize">For {type}</span>
-                </label>
+            <div className="grid grid-cols-3 gap-3">
+              {LISTING_TYPES.map(t => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setListingType(t.value)}
+                  style={{
+                    border: listingType === t.value ? "2px solid #FF385C" : "1px solid #DDDDDD",
+                    borderRadius: "12px", padding: "14px 10px", background: listingType === t.value ? "#FFF0F2" : "white",
+                    cursor: "pointer", textAlign: "center",
+                  }}
+                >
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: listingType === t.value ? "#FF385C" : "#222", marginBottom: "2px" }}>{t.label}</p>
+                  <p style={{ fontSize: "11px", color: "#717171" }}>{t.desc}</p>
+                </button>
               ))}
             </div>
           </div>
 
+          {/* Title */}
           <div>
             <label style={labelStyle}>TITLE</label>
-            <input name="title" required placeholder="e.g. Spacious 2BR apartment in Salmiya" style={inputStyle} className="focus:outline-none" />
+            <input name="title" required
+              placeholder={listingType === "short_stay" ? "e.g. Private chalet with pool in Messila" : "e.g. Spacious 2BR apartment in Salmiya"}
+              style={inputStyle} className="focus:outline-none" />
           </div>
 
+          {/* Description */}
           <div>
             <label style={labelStyle}>DESCRIPTION</label>
-            <textarea name="description" rows={3} placeholder="Describe the property..." style={{ ...inputStyle, resize: "none" }} className="focus:outline-none" />
+            <textarea name="description" rows={4}
+              placeholder={listingType === "short_stay" ? "Describe the chalet — pool, BBQ, capacity, amenities..." : "Describe the property — floor, furnishing, parking..."}
+              style={{ ...inputStyle, resize: "none" }} className="focus:outline-none" />
           </div>
 
-          <div>
-            <label style={labelStyle}>PRICE (KWD)</label>
-            <input name="price" type="number" required min={0} placeholder="e.g. 350" style={inputStyle} className="focus:outline-none" />
-          </div>
+          {/* Price — changes based on listing type */}
+          {listingType === "short_stay" ? (
+            <div>
+              <label style={labelStyle}>PRICE PER NIGHT (KWD)</label>
+              <input name="price_per_night" type="number" required min={0} placeholder="e.g. 80" style={inputStyle} className="focus:outline-none" />
+            </div>
+          ) : (
+            <div>
+              <label style={labelStyle}>{listingType === "rent" ? "PRICE PER MONTH (KWD)" : "PRICE (KWD)"}</label>
+              <input name="price" type="number" required min={0} placeholder={listingType === "rent" ? "e.g. 350" : "e.g. 95000"} style={inputStyle} className="focus:outline-none" />
+            </div>
+          )}
 
+          {/* Area */}
           <div>
             <label style={labelStyle}>AREA</label>
             <select name="area" required style={inputStyle} className="focus:outline-none">
@@ -152,6 +202,7 @@ export default function NewListingPage() {
             </select>
           </div>
 
+          {/* Property type */}
           <div>
             <label style={labelStyle}>PROPERTY TYPE</label>
             <select name="property_type" required style={inputStyle} className="focus:outline-none">
@@ -160,6 +211,7 @@ export default function NewListingPage() {
             </select>
           </div>
 
+          {/* Bedrooms + Bathrooms */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label style={labelStyle}>BEDROOMS</label>
@@ -185,22 +237,43 @@ export default function NewListingPage() {
             </div>
           </div>
 
+          {/* Short stay capacity */}
+          {listingType === "short_stay" && (
+            <div>
+              <label style={labelStyle}>MAX GUESTS</label>
+              <select name="max_guests" style={inputStyle} className="focus:outline-none">
+                <option value="">-</option>
+                {[2,4,6,8,10,12,15,20,25,30].map(n => (
+                  <option key={n} value={n}>Up to {n} guests</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Phone */}
           <div>
             <label style={labelStyle}>PHONE NUMBER</label>
-            <input name="phone_number" required placeholder="e.g. +965 9999 9999" style={inputStyle} className="focus:outline-none" />
+            <input name="phone_number" required placeholder="+965 9999 9999" style={inputStyle} className="focus:outline-none" />
           </div>
 
+          {/* Photos */}
           <div>
-            <label style={labelStyle}>PHOTOS <span style={{ color: "#8C7B65", fontWeight: "400", textTransform: "none", letterSpacing: "0" }}>(select multiple — auto compressed)</span></label>
-            <input type="file" accept="image/*" multiple onChange={handlePhotoChange} style={{ color: "#6B5F50", fontSize: "13px" }} className="w-full" />
+            <label style={labelStyle}>PHOTOS <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(optional — auto compressed)</span></label>
+            <div style={{ border: "1px dashed #DDDDDD", borderRadius: "8px", padding: "20px", textAlign: "center" }}>
+              <input type="file" accept="image/*" multiple onChange={handlePhotoChange} style={{ fontSize: "13px", color: "#717171" }} className="w-full" />
+              <p style={{ fontSize: "12px", color: "#717171", marginTop: "8px" }}>Select multiple photos. Each will be compressed automatically.</p>
+            </div>
             {photos.length > 0 && (
               <div className="mt-3">
-                <p style={{ fontSize: "12px", color: "#8C7B65" }} className="mb-2">{photos.length} photo{photos.length > 1 ? "s" : ""} selected</p>
+                <p style={{ fontSize: "12px", color: "#717171" }} className="mb-2">{photos.length} photo{photos.length > 1 ? "s" : ""} selected</p>
                 <div className="grid grid-cols-3 gap-2">
                   {photos.map((file, i) => (
                     <div key={i} className="relative">
-                      <img src={URL.createObjectURL(file)} alt={`preview ${i}`} className="w-full h-20 object-cover rounded" />
-                      <button type="button" onClick={() => setPhotos(photos.filter((_, j) => j !== i))} style={{ background: "#1C3829", color: "#FAF8F4", fontSize: "12px" }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center">×</button>
+                      <img src={URL.createObjectURL(file)} alt={`preview ${i}`} className="w-full h-24 object-cover" style={{ borderRadius: "8px" }} />
+                      <button type="button" onClick={() => setPhotos(photos.filter((_, j) => j !== i))}
+                        style={{ background: "#222", color: "white", fontSize: "14px", position: "absolute", top: "4px", right: "4px", width: "22px", height: "22px", borderRadius: "50%", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -208,7 +281,10 @@ export default function NewListingPage() {
             )}
           </div>
 
-          <button type="submit" disabled={loading} style={{ background: "#1C3829", color: "#FAF8F4", borderRadius: "4px", fontSize: "14px", border: "none", letterSpacing: "0.3px" }} className="w-full py-3.5 font-medium disabled:opacity-50 mt-2">
+          {/* Submit */}
+          <button type="submit" disabled={loading}
+            style={{ background: loading ? "#DDDDDD" : "#FF385C", color: "white", borderRadius: "8px", fontSize: "15px", border: "none", fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", padding: "14px" }}
+            className="w-full mt-2">
             {loading ? "Posting..." : "Post listing →"}
           </button>
 
