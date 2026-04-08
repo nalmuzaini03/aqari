@@ -26,8 +26,7 @@ const PROPERTY_ICONS: Record<string, React.ReactElement> = {
 
 export default function FiltersModal({
   areas, propertyTypes, selectedAreas,
-  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice,
-  onClose,
+  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, onClose,
 }: Props) {
   const router = useRouter()
   const pathname = usePathname()
@@ -48,11 +47,7 @@ export default function FiltersModal({
   }
 
   function clearAll() {
-    setListingType("")
-    setPropertyType("")
-    setLocalAreas([])
-    setBedrooms(-1)
-    setMaxPrice(-1)
+    setListingType(""); setPropertyType(""); setLocalAreas([]); setBedrooms(-1); setMaxPrice(-1)
   }
 
   function apply() {
@@ -66,37 +61,33 @@ export default function FiltersModal({
     onClose()
   }
 
-  const formatPrice = (val: number) => {
-    if (val >= priceMax) return isForSale ? "2,000,000+ KWD" : "10,000+ KWD"
-    return `${val.toLocaleString()} KWD`
-  }
+  const formatPrice = (val: number) => val >= priceMax ? (isForSale ? "2,000,000+ KWD" : "10,000+ KWD") : `${val.toLocaleString()} KWD`
+
+  const sectionLabel = { fontSize: "11px", color: "#717171", letterSpacing: "1px", marginBottom: "12px", fontWeight: 600 }
 
   return (
     <div
       style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ background: "#FAF8F4", borderRadius: "12px 12px 0 0", width: "100%", maxWidth: "600px", maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: "white", borderRadius: "16px 16px 0 0", width: "100%", maxWidth: "600px", maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid #E8E0D0" }}>
-          <span style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#1C3829" }}>Filters</span>
-          <button onClick={onClose} style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#F2EDE4", border: "none", cursor: "pointer", fontSize: "18px", color: "#6B5F50", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid #EBEBEB" }}>
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>Filters</span>
+          <button onClick={onClose} style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#F7F7F7", border: "1px solid #EBEBEB", cursor: "pointer", fontSize: "18px", color: "#222", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
         </div>
 
         {/* Body */}
         <div style={{ overflowY: "auto", padding: "24px", flex: 1 }}>
 
           {/* Listing type */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px", marginBottom: "12px" }}>LISTING TYPE</p>
+          <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
+            <p style={sectionLabel}>LISTING TYPE</p>
             <div style={{ display: "flex", gap: "8px" }}>
               {[{ val: "", label: "All" }, { val: "rent", label: "For rent" }, { val: "sale", label: "For sale" }].map(t => (
-                <button
-                  key={t.val}
-                  onClick={() => { setListingType(t.val); setMaxPrice(-1) }}
-                  style={{ flex: 1, padding: "10px", borderRadius: "6px", border: listingType === t.val ? "1.5px solid #1C3829" : "1px solid #E8E0D0", background: listingType === t.val ? "#F2EDE4" : "#FAF8F4", color: "#1C3829", fontSize: "13px", cursor: "pointer", fontWeight: listingType === t.val ? "500" : "400" }}
-                >
+                <button key={t.val} onClick={() => { setListingType(t.val); setMaxPrice(-1) }}
+                  style={{ flex: 1, padding: "10px", borderRadius: "8px", border: listingType === t.val ? "2px solid #222" : "1px solid #DDDDDD", background: "white", color: "#222", fontSize: "13px", cursor: "pointer", fontWeight: listingType === t.val ? 700 : 400 }}>
                   {t.label}
                 </button>
               ))}
@@ -104,77 +95,61 @@ export default function FiltersModal({
           </div>
 
           {/* Property type */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px", marginBottom: "12px" }}>PROPERTY TYPE</p>
+          <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
+            <p style={sectionLabel}>PROPERTY TYPE</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
               {propertyTypes.map(t => (
-                <button
-                  key={t}
-                  onClick={() => setPropertyType(propertyType === t ? "" : t)}
-                  style={{ border: propertyType === t ? "1.5px solid #1C3829" : "1px solid #E8E0D0", borderRadius: "6px", padding: "12px 6px", background: propertyType === t ? "#F2EDE4" : "#FAF8F4", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", color: propertyType === t ? "#1C3829" : "#6B5F50" }}
-                >
+                <button key={t} onClick={() => setPropertyType(propertyType === t ? "" : t)}
+                  style={{ border: propertyType === t ? "2px solid #222" : "1px solid #DDDDDD", borderRadius: "8px", padding: "12px 6px", background: "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", color: propertyType === t ? "#222" : "#717171" }}>
                   {PROPERTY_ICONS[t]}
-                  <span style={{ fontSize: "11px" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
+                  <span style={{ fontSize: "11px", fontWeight: propertyType === t ? 600 : 400 }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Bedrooms */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px", marginBottom: "12px" }}>BEDROOMS</p>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0" }}>
+          <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
+            <p style={sectionLabel}>BEDROOMS</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p style={{ fontSize: "14px", color: "#1C3829" }}>Bedrooms</p>
-                <p style={{ fontSize: "12px", color: "#8C7B65", marginTop: "2px" }}>Minimum number</p>
+                <p style={{ fontSize: "14px", color: "#222", fontWeight: 500 }}>Bedrooms</p>
+                <p style={{ fontSize: "12px", color: "#717171", marginTop: "2px" }}>Minimum number</p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                <button
-                  onClick={() => setBedrooms(b => Math.max(-1, b - 1))}
-                  style={{ width: "32px", height: "32px", borderRadius: "50%", border: `1.5px solid ${bedrooms <= -1 ? "#E8E0D0" : "#8C7B65"}`, background: "transparent", cursor: bedrooms <= -1 ? "default" : "pointer", color: bedrooms <= -1 ? "#D4C9B5" : "#6B5F50", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                >−</button>
-                <span style={{ fontFamily: "Georgia, serif", fontSize: "16px", color: "#1C3829", minWidth: "32px", textAlign: "center" }}>
+                <button onClick={() => setBedrooms(b => Math.max(-1, b - 1))}
+                  style={{ width: "32px", height: "32px", borderRadius: "50%", border: `1.5px solid ${bedrooms <= -1 ? "#DDDDDD" : "#222"}`, background: "transparent", cursor: bedrooms <= -1 ? "default" : "pointer", color: bedrooms <= -1 ? "#DDDDDD" : "#222", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                <span style={{ fontSize: "16px", fontWeight: 600, color: "#222", minWidth: "40px", textAlign: "center" }}>
                   {bedrooms === -1 ? "Any" : bedrooms === 0 ? "Studio" : bedrooms}
                 </span>
-                <button
-                  onClick={() => setBedrooms(b => Math.min(6, b + 1))}
-                  style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px solid #8C7B65", background: "transparent", cursor: "pointer", color: "#6B5F50", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                >+</button>
+                <button onClick={() => setBedrooms(b => Math.min(6, b + 1))}
+                  style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px solid #222", background: "transparent", cursor: "pointer", color: "#222", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
               </div>
             </div>
           </div>
 
           {/* Price */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px", marginBottom: "12px" }}>MAX PRICE</p>
-            <p style={{ fontFamily: "Georgia, serif", fontSize: "24px", color: "#1C3829", marginBottom: "12px" }}>
+          <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
+            <p style={sectionLabel}>MAX PRICE</p>
+            <p style={{ fontSize: "22px", fontWeight: 700, color: "#222", marginBottom: "16px" }}>
               {maxPrice === -1 ? "Any price" : formatPrice(sliderValue)}
             </p>
-            <input
-              type="range"
-              min={priceMin}
-              max={priceMax}
-              step={priceStep}
-              value={sliderValue}
+            <input type="range" min={priceMin} max={priceMax} step={priceStep} value={sliderValue}
               onChange={e => setMaxPrice(Number(e.target.value))}
-              style={{ width: "100%", accentColor: "#1C3829" }}
-            />
+              style={{ width: "100%", accentColor: "#FF385C" }} />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
-              <span style={{ fontSize: "11px", color: "#8C7B65" }}>{priceMin.toLocaleString()} KWD</span>
-              <span style={{ fontSize: "11px", color: "#8C7B65" }}>{isForSale ? "2,000,000+ KWD" : "10,000+ KWD"}</span>
+              <span style={{ fontSize: "11px", color: "#717171" }}>{priceMin.toLocaleString()} KWD</span>
+              <span style={{ fontSize: "11px", color: "#717171" }}>{isForSale ? "2,000,000+ KWD" : "10,000+ KWD"}</span>
             </div>
           </div>
 
           {/* Areas */}
           <div>
-            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px", marginBottom: "12px" }}>AREA</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+            <p style={sectionLabel}>AREA</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {areas.map(area => (
-                <button
-                  key={area}
-                  onClick={() => toggleArea(area)}
-                  style={{ border: localAreas.includes(area) ? "1.5px solid #1C3829" : "1px solid #E8E0D0", borderRadius: "4px", padding: "6px 12px", fontSize: "12px", color: localAreas.includes(area) ? "#1C3829" : "#6B5F50", background: localAreas.includes(area) ? "#F2EDE4" : "#FAF8F4", cursor: "pointer", fontWeight: localAreas.includes(area) ? "500" : "400" }}
-                >
+                <button key={area} onClick={() => toggleArea(area)}
+                  style={{ border: localAreas.includes(area) ? "2px solid #222" : "1px solid #DDDDDD", borderRadius: "24px", padding: "6px 14px", fontSize: "13px", color: localAreas.includes(area) ? "#222" : "#717171", background: "white", cursor: "pointer", fontWeight: localAreas.includes(area) ? 600 : 400 }}>
                   {area}
                 </button>
               ))}
@@ -184,11 +159,11 @@ export default function FiltersModal({
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "16px 24px", borderTop: "1px solid #E8E0D0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <button onClick={clearAll} style={{ fontSize: "13px", color: "#8C7B65", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+        <div style={{ padding: "16px 24px", borderTop: "1px solid #EBEBEB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button onClick={clearAll} style={{ fontSize: "13px", color: "#222", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontWeight: 600 }}>
             Clear all
           </button>
-          <button onClick={apply} style={{ background: "#1C3829", color: "#FAF8F4", border: "none", borderRadius: "4px", padding: "10px 28px", fontSize: "13px", fontWeight: "500", cursor: "pointer", letterSpacing: "0.3px" }}>
+          <button onClick={apply} style={{ background: "#FF385C", color: "white", border: "none", borderRadius: "8px", padding: "12px 28px", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
             Show listings
           </button>
         </div>
