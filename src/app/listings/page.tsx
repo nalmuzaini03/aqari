@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import ListingsGrid from "@/components/ListingsGrid"
 import FiltersBar from "@/components/FiltersBar"
+import ListingsMap from "@/components/ListingsMap"
 import { KUWAIT_AREAS, PROPERTY_TYPES } from "@/lib/constants"
 
 export const revalidate = 0
@@ -9,7 +10,7 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
 export default async function ListingsPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams
-  const { listing_type, area, property_type, bedrooms, max_price } = params
+  const { listing_type, area, property_type, bedrooms, max_price, view } = params
 
   let query = supabase
     .from("property_listings")
@@ -36,9 +37,10 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
   const { data: listings, error } = await query
 
   const selectedAreas = area ? (Array.isArray(area) ? area : [area]) : []
+  const showMap = view === "map"
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col" style={{ height: "100dvh" }}>
       <FiltersBar
         areas={KUWAIT_AREAS}
         propertyTypes={PROPERTY_TYPES}
@@ -47,11 +49,31 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
         currentPropertyType={typeof property_type === "string" ? property_type : ""}
         currentBedrooms={typeof bedrooms === "string" ? bedrooms : ""}
         currentMaxPrice={typeof max_price === "string" ? max_price : ""}
+        showMap={showMap}
       />
+
       {error ? (
         <p className="p-8" style={{ color: "#0A5C46" }}>Failed to load listings.</p>
+      ) : showMap ? (
+        <div style={{ flex: 1, position: "relative" }}>
+          <ListingsMap listings={listings ?? []} />
+        </div>
       ) : (
-        <ListingsGrid listings={listings ?? []} />
+        <div className="hidden lg:flex flex-1 overflow-hidden">
+          <div className="w-1/2 overflow-y-auto">
+            <ListingsGrid listings={listings ?? []} />
+          </div>
+          <div className="w-1/2" style={{ position: "sticky", top: 0, height: "calc(100dvh - 60px)" }}>
+            <ListingsMap listings={listings ?? []} />
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: grid only, with map toggle */}
+      {!showMap && (
+        <div className="lg:hidden flex-1 overflow-y-auto">
+          <ListingsGrid listings={listings ?? []} />
+        </div>
       )}
     </main>
   )

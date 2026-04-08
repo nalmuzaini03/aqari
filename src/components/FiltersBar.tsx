@@ -10,6 +10,7 @@ type Props = {
   currentPropertyType: string
   currentBedrooms: string
   currentMaxPrice: string
+  showMap: boolean
 }
 
 export default function FiltersBar({
@@ -20,6 +21,7 @@ export default function FiltersBar({
   currentPropertyType,
   currentBedrooms,
   currentMaxPrice,
+  showMap,
 }: Props) {
   const router = useRouter()
   const pathname = usePathname()
@@ -43,7 +45,7 @@ export default function FiltersBar({
     }
   }, [])
 
-  function pushParams(overrides: Record<string, string | string[]>) {
+  function buildParams(overrides: Record<string, string | string[]>) {
     const params = new URLSearchParams()
     const all: Record<string, string | string[]> = {
       listing_type: currentListingType,
@@ -51,6 +53,7 @@ export default function FiltersBar({
       bedrooms: currentBedrooms,
       max_price: currentMaxPrice,
       area: localAreas,
+      ...(showMap ? { view: "map" } : {}),
       ...overrides,
     }
     Object.entries(all).forEach(([k, v]) => {
@@ -58,11 +61,11 @@ export default function FiltersBar({
       if (Array.isArray(v)) v.forEach(val => params.append(k, val))
       else params.set(k, v)
     })
-    router.push(`${pathname}?${params.toString()}`)
+    return params.toString()
   }
 
   function updateSingle(key: string, value: string) {
-    pushParams({ [key]: value })
+    router.push(`${pathname}?${buildParams({ [key]: value })}`)
   }
 
   function toggleArea(area: string) {
@@ -75,6 +78,7 @@ export default function FiltersBar({
     if (currentPropertyType) params.set("property_type", currentPropertyType)
     if (currentBedrooms) params.set("bedrooms", currentBedrooms)
     if (currentMaxPrice) params.set("max_price", currentMaxPrice)
+    if (showMap) params.set("view", "map")
     next.forEach(a => params.append("area", a))
     router.push(`${pathname}?${params.toString()}`)
   }
@@ -86,18 +90,30 @@ export default function FiltersBar({
     if (currentPropertyType) params.set("property_type", currentPropertyType)
     if (currentBedrooms) params.set("bedrooms", currentBedrooms)
     if (currentMaxPrice) params.set("max_price", currentMaxPrice)
+    if (showMap) params.set("view", "map")
     router.push(`${pathname}?${params.toString()}`)
   }
 
   function applyPrice() {
-    pushParams({ max_price: String(sliderValue) })
+    router.push(`${pathname}?${buildParams({ max_price: String(sliderValue) })}`)
     setPriceOpen(false)
   }
 
   function clearPrice() {
     setSliderValue(5000)
-    pushParams({ max_price: "" })
+    router.push(`${pathname}?${buildParams({ max_price: "" })}`)
     setPriceOpen(false)
+  }
+
+  function toggleMap() {
+    const params = new URLSearchParams()
+    if (currentListingType) params.set("listing_type", currentListingType)
+    if (currentPropertyType) params.set("property_type", currentPropertyType)
+    if (currentBedrooms) params.set("bedrooms", currentBedrooms)
+    if (currentMaxPrice) params.set("max_price", currentMaxPrice)
+    localAreas.forEach(a => params.append("area", a))
+    if (!showMap) params.set("view", "map")
+    router.push(`${pathname}?${params.toString()}`)
   }
 
   const selectStyle = { background: "#0D6B52", color: "#7FEDD0", borderColor: "#1D9E75" }
@@ -106,7 +122,7 @@ export default function FiltersBar({
 
   return (
     <div style={{ background: "#0F7A5F" }} className="sticky top-0 z-10 px-4 py-3">
-      <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 mb-2 sm:mb-0">
+      <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2">
 
         <select
           value={currentListingType}
@@ -214,23 +230,45 @@ export default function FiltersBar({
           )}
         </div>
 
-        {/* Buttons */}
-        <div className="flex gap-2">
+        {/* Action buttons */}
+        <div className="flex gap-2 col-span-3 sm:col-span-1">
+          <button
+            onClick={toggleMap}
+            style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }}
+            className="text-sm font-medium px-3 py-1.5 rounded-full flex items-center justify-center gap-1 flex-1"
+          >
+            {showMap ? (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+                List
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                Map
+              </>
+            )}
+          </button>
           <a
             href="/my-listings"
             style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }}
-            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex-1 flex items-center justify-center"
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center flex-1"
           >
             My listings
           </a>
           <a
             href="/login"
             style={{ background: "#7FEDD0", color: "#0A5C46" }}
-            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex-1 flex items-center justify-center"
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center flex-1"
           >
             + Post
           </a>
         </div>
+        
 
       </div>
     </div>
