@@ -20,7 +20,7 @@ export default function SignupPage() {
     if (password.length < 6) { setError("Password must be at least 6 characters"); setLoading(false); return }
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) setError(error.message)
-    else router.push("/listings")
+    else router.push("/listings/new")
     setLoading(false)
   }
 
