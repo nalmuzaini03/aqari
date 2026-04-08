@@ -22,66 +22,71 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ background: "#FAF8F4", minHeight: "100vh" }} className="flex flex-col">
-      <nav style={{ background: "#FAF8F4", borderBottom: "1px solid #E8E0D0" }} className="flex items-center justify-between px-6 sm:px-12 py-5">
-        <Link href="/" style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#1C3829", letterSpacing: "3px" }}>
-          AQ<span style={{ color: "#2D6A4F" }}>A</span>RI
-        </Link>
-        <Link href="/listings" style={{ fontSize: "13px", color: "#6B5F50" }}>Browse listings</Link>
+    <div style={{ background: "white", minHeight: "100vh" }} className="flex flex-col">
+
+      {/* Nav */}
+      <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="flex items-center justify-between px-6 sm:px-10 py-4">
+        <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
+        <Link href="/listings" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", fontWeight: 500 }}>Browse listings</Link>
       </nav>
 
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <div style={{ width: "100%", maxWidth: "420px" }}>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#1C3829", fontWeight: "400" }} className="mb-2">
-            Welcome back
-          </h1>
-          <p style={{ fontSize: "14px", color: "#8C7B65" }} className="mb-8">
-            Sign in to your Aqari account
-          </p>
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+
+          <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#222", letterSpacing: "-0.5px" }} className="mb-1">Welcome back</h1>
+          <p style={{ fontSize: "15px", color: "#717171" }} className="mb-8">Sign in to your Aqari account</p>
 
           {error && (
-            <div style={{ background: "#F2EDE4", border: "1px solid #E8E0D0", borderRadius: "6px", color: "#6B5F50", fontSize: "13px" }} className="mb-4 p-3">{error}</div>
+            <div style={{ background: "#FFF0F2", border: "1px solid #FFD6DF", borderRadius: "8px", color: "#C4001B", fontSize: "13px" }} className="mb-4 p-3">
+              {error}
+            </div>
           )}
 
           <div className="flex flex-col gap-4">
             <div>
-              <label style={{ fontSize: "12px", color: "#8C7B65", letterSpacing: "0.5px" }} className="block mb-2 uppercase">Email address</label>
+              <label style={{ fontSize: "12px", color: "#717171", letterSpacing: "0.5px", fontWeight: 600 }} className="block mb-2">EMAIL ADDRESS</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px" }}
-                className="w-full px-4 py-3 focus:outline-none"
+                style={{ background: "white", border: "1px solid #DDDDDD", color: "#222", borderRadius: "8px", fontSize: "14px", width: "100%", padding: "12px 16px" }}
+                className="focus:outline-none"
                 onKeyDown={e => e.key === "Enter" && handleLogin()}
               />
             </div>
             <div>
-              <label style={{ fontSize: "12px", color: "#8C7B65", letterSpacing: "0.5px" }} className="block mb-2 uppercase">Password</label>
+              <label style={{ fontSize: "12px", color: "#717171", letterSpacing: "0.5px", fontWeight: 600 }} className="block mb-2">PASSWORD</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
-                style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", color: "#1C3829", borderRadius: "4px", fontSize: "14px" }}
-                className="w-full px-4 py-3 focus:outline-none"
+                style={{ background: "white", border: "1px solid #DDDDDD", color: "#222", borderRadius: "8px", fontSize: "14px", width: "100%", padding: "12px 16px" }}
+                className="focus:outline-none"
                 onKeyDown={e => e.key === "Enter" && handleLogin()}
               />
             </div>
             <button
               onClick={handleLogin}
               disabled={loading || email.length < 5 || password.length < 6}
-              style={{ background: "#1C3829", color: "#FAF8F4", borderRadius: "4px", fontSize: "14px", border: "none", letterSpacing: "0.3px" }}
-              className="w-full py-3 font-medium disabled:opacity-50"
+              style={{ background: "#FF385C", color: "white", borderRadius: "8px", fontSize: "15px", border: "none", fontWeight: 700, cursor: "pointer", padding: "14px", opacity: (loading || email.length < 5 || password.length < 6) ? 0.5 : 1 }}
+              className="w-full"
             >
               {loading ? "Signing in..." : "Sign in →"}
             </button>
           </div>
 
-          <p style={{ fontSize: "13px", color: "#8C7B65" }} className="mt-6 text-center">
+          <p style={{ fontSize: "13px", color: "#717171" }} className="mt-6 text-center">
             Don't have an account?{" "}
-            <Link href="/signup" style={{ color: "#2D6A4F" }}>Sign up free</Link>
+            <Link href="/signup" style={{ color: "#FF385C", fontWeight: 600 }}>Sign up free</Link>
           </p>
+
+          <p style={{ fontSize: "13px", color: "#717171" }} className="mt-3 text-center">
+            Want to browse first?{" "}
+            <Link href="/listings" style={{ color: "#222", fontWeight: 600 }}>View listings</Link>
+          </p>
+
         </div>
       </div>
     </div>
