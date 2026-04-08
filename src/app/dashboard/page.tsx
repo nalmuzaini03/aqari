@@ -25,9 +25,7 @@ export default function DashboardPage() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) { router.push("/login"); return }
-
       setUserName(data.session.user.email?.split("@")[0] ?? "there")
-
       const { data: listings } = await supabase
         .from("property_listings")
         .select("id, title, price, area, listing_type, photos")
@@ -57,78 +55,73 @@ export default function DashboardPage() {
   const maxViews = Math.max(...stats.map(l => l.views), 1)
 
   return (
-    <div style={{ background: "#E8F8F3", minHeight: "100vh" }}>
-
-      {/* Nav */}
-      <nav style={{ background: "#0A5C46" }} className="px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" style={{ color: "white" }} className="text-xl font-semibold tracking-tight">
-            aq<span style={{ color: "#7FEDD0" }}>a</span>ri
+    <div style={{ background: "#FAF8F4", minHeight: "100vh" }}>
+      <nav style={{ background: "#1C3829" }} className="px-6 sm:px-12 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/" style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#FAF8F4", letterSpacing: "3px" }}>
+            AQ<span style={{ color: "#A8D5B5" }}>A</span>RI
           </Link>
-          <span style={{ color: "#5DCAA5", fontSize: "12px" }}>Dashboard</span>
+          <span style={{ fontSize: "11px", color: "#6BA882", letterSpacing: "1.5px" }}>DASHBOARD</span>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/listings" style={{ color: "#B2F0DC" }} className="text-sm">Browse</Link>
-          <Link href="/listings/new" style={{ background: "#7FEDD0", color: "#0A5C46" }} className="text-sm font-medium px-4 py-2 rounded-full">
+        <div className="flex items-center gap-4">
+          <Link href="/listings" style={{ fontSize: "13px", color: "#8FB89A" }}>Browse</Link>
+          <Link href="/listings/new" style={{ background: "#FAF8F4", color: "#1C3829", fontSize: "13px", borderRadius: "4px" }} className="px-4 py-2 font-medium">
             + New listing
           </Link>
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-
-        {/* Welcome */}
-        <div className="mb-8">
-          <h1 style={{ color: "#0A5C46" }} className="text-2xl font-semibold">Good to see you, {userName}</h1>
-          <p style={{ color: "#1D9E75" }} className="text-sm mt-1">Here's how your listings are performing</p>
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        <div className="mb-10">
+          <h1 style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#1C3829", fontWeight: "400" }}>Good to see you, {userName}</h1>
+          <p style={{ fontSize: "14px", color: "#8C7B65", marginTop: "4px" }}>Here's how your listings are performing</p>
         </div>
 
         {loading ? (
-          <p style={{ color: "#1D9E75" }} className="text-sm">Loading your dashboard...</p>
+          <p style={{ fontSize: "14px", color: "#8C7B65" }}>Loading your dashboard...</p>
         ) : stats.length === 0 ? (
-          <div style={{ background: "#C8F5E8", border: "1px solid #9FE1CB" }} className="rounded-2xl p-10 text-center">
-            <p style={{ color: "#0A5C46" }} className="text-lg font-medium mb-2">No listings yet</p>
-            <p style={{ color: "#1D9E75" }} className="text-sm mb-6">Post your first listing to start seeing analytics</p>
-            <Link href="/listings/new" style={{ background: "#0F7A5F", color: "#7FEDD0" }} className="text-sm font-medium px-6 py-3 rounded-full">
+          <div style={{ background: "#F2EDE4", border: "1px solid #E8E0D0", borderRadius: "8px" }} className="p-10 text-center">
+            <p style={{ fontFamily: "Georgia, serif", fontSize: "22px", color: "#1C3829" }} className="mb-2">No listings yet</p>
+            <p style={{ fontSize: "14px", color: "#8C7B65" }} className="mb-6">Post your first listing to start seeing analytics</p>
+            <Link href="/listings/new" style={{ background: "#1C3829", color: "#FAF8F4", fontSize: "13px", borderRadius: "4px" }} className="px-6 py-2.5 font-medium">
               Post a listing
             </Link>
           </div>
         ) : (
           <>
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
               {[
-                { label: "Total views", value: totalViews.toLocaleString() },
-                { label: "WhatsApp taps", value: totalClicks.toLocaleString() },
-                { label: "Active listings", value: stats.length.toString() },
-                { label: "Conversion rate", value: `${conversionRate}%` },
+                { label: "TOTAL VIEWS", value: totalViews.toLocaleString() },
+                { label: "WHATSAPP TAPS", value: totalClicks.toLocaleString() },
+                { label: "ACTIVE LISTINGS", value: stats.length.toString() },
+                { label: "CONVERSION RATE", value: `${conversionRate}%` },
               ].map(s => (
-                <div key={s.label} style={{ background: "#C8F5E8", border: "1px solid #9FE1CB" }} className="rounded-2xl p-5">
-                  <p style={{ color: "#1D9E75" }} className="text-xs mb-1">{s.label}</p>
-                  <p style={{ color: "#0A5C46" }} className="text-3xl font-semibold">{s.value}</p>
+                <div key={s.label} style={{ background: "#FAF8F4", border: "1px solid #E8E0D0", borderRadius: "8px" }} className="p-5">
+                  <p style={{ fontSize: "10px", color: "#8C7B65", letterSpacing: "1px" }} className="mb-2">{s.label}</p>
+                  <p style={{ fontFamily: "Georgia, serif", fontSize: "28px", color: "#1C3829", fontWeight: "400" }}>{s.value}</p>
                 </div>
               ))}
             </div>
 
-            {/* Listings performance */}
-            <h2 style={{ color: "#0A5C46" }} className="text-base font-medium mb-4">Listing performance</h2>
+            <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "1px" }} className="mb-4">LISTING PERFORMANCE</p>
             <div className="flex flex-col gap-3">
               {stats.map((listing, i) => (
                 <div
                   key={listing.id}
                   style={{
-                    background: i === 0 ? "#B2F0DC" : "#C8F5E8",
-                    border: i === 0 ? "2px solid #1D9E75" : "1px solid #9FE1CB"
+                    background: "#FAF8F4",
+                    border: i === 0 ? "1.5px solid #2D6A4F" : "1px solid #E8E0D0",
+                    borderRadius: "8px",
                   }}
-                  className="rounded-2xl p-4"
+                  className="p-4"
                 >
                   <div className="flex items-center gap-4">
-                    <div style={{ background: "#9FE1CB" }} className="w-14 h-14 rounded-xl flex-shrink-0 overflow-hidden">
+                    <div style={{ background: "#F2EDE4", border: "1px solid #E8E0D0", borderRadius: "6px" }} className="w-14 h-14 flex-shrink-0 overflow-hidden">
                       {listing.photos && listing.photos.length > 0 ? (
                         <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-6 h-6" style={{ color: "#0F7A5F" }} fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-6 h-6" style={{ color: "#D4C9B5" }} fill="currentColor" viewBox="0 0 24 24">
                             <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
                           </svg>
                         </div>
@@ -137,59 +130,54 @@ export default function DashboardPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p style={{ color: "#0A5C46" }} className="text-sm font-medium truncate">{listing.title}</p>
+                        <p style={{ fontSize: "14px", fontWeight: "500", color: "#1C3829" }} className="truncate">{listing.title}</p>
                         {i === 0 && (
-                          <span style={{ background: "#0F7A5F", color: "#7FEDD0" }} className="text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                          <span style={{ background: "#1C3829", color: "#A8D5B5", fontSize: "10px", letterSpacing: "0.5px" }} className="px-2 py-0.5 rounded uppercase flex-shrink-0">
                             Top performer
                           </span>
                         )}
                       </div>
-                      <p style={{ color: "#1D9E75" }} className="text-xs">{listing.price.toLocaleString()} KWD · {listing.area}</p>
-                      <div className="mt-2">
-                        <div style={{ background: "#9FE1CB" }} className="rounded-full h-1.5 mt-1">
-                          <div
-                            style={{ background: "#0F7A5F", width: `${(listing.views / maxViews) * 100}%` }}
-                            className="h-1.5 rounded-full"
-                          />
-                        </div>
+                      <p style={{ fontSize: "12px", color: "#8C7B65" }}>{listing.price.toLocaleString()} KWD · {listing.area}</p>
+                      <div style={{ background: "#F2EDE4", borderRadius: "99px" }} className="h-1.5 mt-2">
+                        <div
+                          style={{ background: "#2D6A4F", width: `${(listing.views / maxViews) * 100}%`, borderRadius: "99px" }}
+                          className="h-1.5"
+                        />
                       </div>
                     </div>
 
                     <div className="flex gap-4 flex-shrink-0 text-center">
                       <div>
-                        <p style={{ color: "#0A5C46" }} className="text-xl font-semibold">{listing.views}</p>
-                        <p style={{ color: "#1D9E75" }} className="text-xs">Views</p>
+                        <p style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#1C3829" }}>{listing.views}</p>
+                        <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "0.5px" }}>VIEWS</p>
                       </div>
                       <div>
-                        <p style={{ color: "#0A5C46" }} className="text-xl font-semibold">{listing.clicks}</p>
-                        <p style={{ color: "#1D9E75" }} className="text-xs">Taps</p>
+                        <p style={{ fontFamily: "Georgia, serif", fontSize: "20px", color: "#1C3829" }}>{listing.clicks}</p>
+                        <p style={{ fontSize: "11px", color: "#8C7B65", letterSpacing: "0.5px" }}>TAPS</p>
                       </div>
                     </div>
 
-                    <div className="flex gap-2 flex-shrink-0">
-                      <Link
-                        href={`/listings/${listing.id}`}
-                        style={{ color: "#0F7A5F", border: "1px solid #1D9E75" }}
-                        className="text-xs px-3 py-1.5 rounded-lg"
-                      >
-                        View
-                      </Link>
-                    </div>
+                    <Link
+                      href={`/listings/${listing.id}`}
+                      style={{ color: "#2D6A4F", border: "1px solid #E8E0D0", fontSize: "12px", borderRadius: "4px" }}
+                      className="px-3 py-1.5 flex-shrink-0"
+                    >
+                      View
+                    </Link>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Upsell CTA */}
-            <div style={{ background: "#0A5C46" }} className="rounded-2xl p-6 mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div style={{ background: "#1C3829", borderRadius: "8px" }} className="p-6 mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 style={{ color: "#E8FFF8" }} className="text-base font-medium mb-1">Get more views with featured listings</h3>
-                <p style={{ color: "#7FEDD0" }} className="text-sm">Featured listings appear at the top of search results and get 3x more views.</p>
+                <h3 style={{ fontFamily: "Georgia, serif", color: "#FAF8F4", fontSize: "18px", fontWeight: "400" }} className="mb-1">Get more views with featured listings</h3>
+                <p style={{ fontSize: "14px", color: "#6BA882" }}>Featured listings appear at the top of search results and get 3x more views.</p>
               </div>
               <Link
                 href="/listings/new"
-                style={{ background: "#7FEDD0", color: "#0A5C46" }}
-                className="text-sm font-medium px-5 py-2.5 rounded-full whitespace-nowrap flex-shrink-0"
+                style={{ background: "#FAF8F4", color: "#1C3829", fontSize: "13px", borderRadius: "4px", whiteSpace: "nowrap" }}
+                className="px-5 py-2.5 font-medium flex-shrink-0"
               >
                 Feature a listing
               </Link>

@@ -30,8 +30,8 @@ export default function DeleteButton({ listingId }: { listingId: string }) {
     <button
       onClick={handleDelete}
       disabled={deleting}
-      style={{ background: "#0A5C46", color: "#7FEDD0" }}
-      className="text-sm px-4 py-1.5 rounded-full disabled:opacity-50"
+      style={{ background: "#F2EDE4", color: "#6B5F50", border: "1px solid #E8E0D0", borderRadius: "4px", fontSize: "13px" }}
+      className="px-4 py-1.5 disabled:opacity-50"
     >
       {deleting ? "Deleting..." : "Delete listing"}
     </button>
