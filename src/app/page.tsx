@@ -172,33 +172,36 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: "64px 24px", background: "white" }}>
-        <div style={{ marginBottom: "32px" }}>
-          <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#222", marginBottom: "6px", letterSpacing: "-0.5px" }}>Browse by area</h2>
-          <p style={{ fontSize: "15px", color: "#717171" }}>تصفح حسب المنطقة — Select a governorate then browse areas</p>
-        </div>
-        <div className="flex gap-2 flex-wrap mb-6">
-          {GOVERNORATES.map(g => (
-            <button key={g.en} onClick={() => setActiveGov(g.en)} style={{ padding: "8px 18px", borderRadius: "24px", border: activeGov === g.en ? "1.5px solid #FF385C" : "1.5px solid #EBEBEB", background: activeGov === g.en ? "#FFF0F2" : "white", color: activeGov === g.en ? "#FF385C" : "#222", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
-              {g.en}{g.ar ? ` · ${g.ar}` : ""}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ maxWidth: "960px" }}>
-          {areas.map(area => (
-            <button key={area.en} onClick={() => handleAreaClick(area.en)} style={{ background: "#FFF0F2", borderRadius: "14px", padding: "20px 16px", textAlign: "center", cursor: "pointer", border: "1.5px solid #FFD6DF" }}>
-              <div style={{ fontSize: "15px", fontWeight: 700, color: "#222" }}>{area.en}</div>
-              <div style={{ fontSize: "13px", color: "#FF385C", direction: "rtl", marginTop: "4px", fontWeight: 500 }}>{area.ar}</div>
-            </button>
-          ))}
+        <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
+          <div style={{ marginBottom: "32px" }}>
+            <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#222", marginBottom: "6px", letterSpacing: "-0.5px" }}>Browse by area</h2>
+            <p style={{ fontSize: "15px", color: "#717171" }}>تصفح حسب المنطقة — Select a governorate then browse areas</p>
+          </div>
+          <div className="flex gap-2 flex-wrap mb-6">
+            {GOVERNORATES.map(g => (
+              <button key={g.en} onClick={() => setActiveGov(g.en)} style={{ padding: "8px 18px", borderRadius: "24px", border: activeGov === g.en ? "1.5px solid #FF385C" : "1.5px solid #EBEBEB", background: activeGov === g.en ? "#FFF0F2" : "white", color: activeGov === g.en ? "#FF385C" : "#222", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
+                {g.en}{g.ar ? ` · ${g.ar}` : ""}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {areas.map(area => (
+              <button key={area.en} onClick={() => handleAreaClick(area.en)} style={{ background: "#FFF0F2", borderRadius: "14px", padding: "20px 16px", textAlign: "center", cursor: "pointer", border: "1.5px solid #FFD6DF" }}>
+                <div style={{ fontSize: "15px", fontWeight: 700, color: "#222" }}>{area.en}</div>
+                <div style={{ fontSize: "13px", color: "#FF385C", direction: "rtl", marginTop: "4px", fontWeight: 500 }}>{area.ar}</div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
       <section style={{ padding: "64px 24px", background: "#F7F7F7" }}>
+        <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
         <div style={{ marginBottom: "40px" }}>
           <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#222", marginBottom: "6px", letterSpacing: "-0.5px" }}>Why choose Aqari?</h2>
           <p style={{ fontSize: "15px", color: "#717171" }}>لماذا تختار عقاري؟</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6" style={{ maxWidth: "960px" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
             { icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", title: "Verified listings", ar: "إعلانات موثقة", desc: "Every listing is reviewed before going live. No fake listings, no scams." },
             { icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z", title: "Direct WhatsApp contact", ar: "تواصل مباشر عبر واتساب", desc: "One tap to message the owner or agency directly. Fast and simple." },
@@ -214,14 +217,16 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       <section style={{ padding: "64px 24px", background: "white" }}>
+        <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
         <div style={{ marginBottom: "40px" }}>
           <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#222", marginBottom: "6px", letterSpacing: "-0.5px" }}>How it works</h2>
           <p style={{ fontSize: "15px", color: "#717171" }}>كيف يعمل عقاري؟ — Three simple steps</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6" style={{ maxWidth: "960px" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
             { num: "01", title: "Browse & filter", desc: "Search by governorate, area, price, bedrooms and property type across all of Kuwait." },
             { num: "02", title: "Contact directly", desc: "Tap once to open WhatsApp and message the owner or agency directly." },
@@ -233,6 +238,7 @@ export default function HomePage() {
               <p style={{ fontSize: "15px", color: "#717171", lineHeight: 1.6 }}>{s.desc}</p>
             </div>
           ))}
+        </div>
         </div>
       </section>
 
