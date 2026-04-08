@@ -85,7 +85,7 @@ export default function FiltersModal({
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
             <p style={sectionLabel}>LISTING TYPE</p>
             <div style={{ display: "flex", gap: "8px" }}>
-              {[{ val: "", label: "All" }, { val: "rent", label: "For rent" }, { val: "sale", label: "For sale" }].map(t => (
+              {[{ val: "", label: "All" }, { val: "rent", label: "For rent" }, { val: "short_stay", label: "Short stay" }, { val: "sale", label: "For sale" }].map(t => (
                 <button key={t.val} onClick={() => { setListingType(t.val); setMaxPrice(-1) }}
                   style={{ flex: 1, padding: "10px", borderRadius: "8px", border: listingType === t.val ? "2px solid #222" : "1px solid #DDDDDD", background: "white", color: "#222", fontSize: "13px", cursor: "pointer", fontWeight: listingType === t.val ? 700 : 400 }}>
                   {t.label}

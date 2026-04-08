@@ -11,5 +11,6 @@ export type Listing = {
   photos: string[]
   is_verified: boolean
   created_at: string
-  listing_type: "rent" | "sale"
+  listing_type: "rent" | "sale" | "short_stay"
+  price_per_night: number | null
 }
