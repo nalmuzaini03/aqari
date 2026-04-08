@@ -5,6 +5,31 @@ import { supabase } from "@/lib/supabase"
 import { createClient } from "@/lib/supabase-browser"
 import { KUWAIT_AREAS, PROPERTY_TYPES } from "@/lib/constants"
 
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement("canvas")
+      const maxSize = 1200
+      let { width, height } = img
+      if (width > maxSize || height > maxSize) {
+        if (width > height) { height = (height / width) * maxSize; width = maxSize }
+        else { width = (width / height) * maxSize; height = maxSize }
+      }
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext("2d")!
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(blob => {
+        URL.revokeObjectURL(url)
+        resolve(new File([blob!], file.name, { type: "image/jpeg" }))
+      }, "image/jpeg", 0.75)
+    }
+    img.src = url
+  })
+}
+
 export default function NewListingPage() {
   const router = useRouter()
   const supabaseBrowser = createClient()
@@ -18,11 +43,16 @@ export default function NewListingPage() {
     })
   }, [])
 
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? [])
+    const compressed = await Promise.all(files.map(compressImage))
+    setPhotos(prev => [...prev, ...compressed])
+  }
+
   async function uploadPhotos(listingId: string): Promise<string[]> {
     const urls: string[] = []
     for (const file of photos) {
-      const ext = file.name.split(".").pop()
-      const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
       const { error } = await supabase.storage.from("listing-photos").upload(path, file)
       if (error) continue
       const { data } = supabase.storage.from("listing-photos").getPublicUrl(path)
@@ -70,6 +100,7 @@ export default function NewListingPage() {
         <p style={{ color: "#1D9E75" }} className="text-sm mb-8">Fill in the details below to list your property on Aqari.</p>
         {error && <div className="mb-6 p-3 rounded-lg text-sm" style={{ background: "#B2F0DC", color: "#0A5C46" }}>{error}</div>}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Listing type</label>
             <div className="flex gap-3">
@@ -81,18 +112,22 @@ export default function NewListingPage() {
               ))}
             </div>
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Title</label>
             <input name="title" required placeholder="e.g. Spacious 2BR apartment in Salmiya" style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none" />
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Description</label>
             <textarea name="description" rows={3} placeholder="Describe the property..." style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none resize-none" />
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Price (KWD)</label>
             <input name="price" type="number" required min={0} placeholder="e.g. 350" style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none" />
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Area</label>
             <select name="area" required style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none">
@@ -100,6 +135,7 @@ export default function NewListingPage() {
               {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Property type</label>
             <select name="property_type" required style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none">
@@ -107,6 +143,7 @@ export default function NewListingPage() {
               {PROPERTY_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
             </select>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Bedrooms</label>
@@ -131,19 +168,21 @@ export default function NewListingPage() {
               </select>
             </div>
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">Phone number</label>
             <input name="phone_number" required placeholder="e.g. +965 9999 9999" style={{ background: "#B2F0DC", border: "1px solid #7FEDD0", color: "#0A5C46" }} className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none" />
           </div>
+
           <div>
             <label style={{ color: "#0F7A5F" }} className="block text-sm font-medium mb-1">
-              Photos <span style={{ color: "#1D9E75", fontWeight: "normal", fontSize: "12px" }}>(you can select multiple)</span>
+              Photos <span style={{ color: "#1D9E75", fontWeight: "normal", fontSize: "12px" }}>(select multiple — auto compressed)</span>
             </label>
             <input
               type="file"
               accept="image/*"
               multiple
-              onChange={e => setPhotos(Array.from(e.target.files ?? []))}
+              onChange={handlePhotoChange}
               style={{ color: "#1D9E75" }}
               className="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-medium"
             />
@@ -160,7 +199,7 @@ export default function NewListingPage() {
                         className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
                         style={{ background: "#0A5C46", color: "#7FEDD0" }}
                       >
-                        x
+                        ×
                       </button>
                     </div>
                   ))}
@@ -168,9 +207,11 @@ export default function NewListingPage() {
               </div>
             )}
           </div>
+
           <button type="submit" disabled={loading} style={{ background: "#0F7A5F", color: "#7FEDD0" }} className="w-full rounded-lg py-3 text-sm font-medium disabled:opacity-50 mt-2">
             {loading ? "Posting..." : "Post listing"}
           </button>
+
         </form>
       </div>
     </div>
