@@ -69,6 +69,9 @@ export default function NewListingPage() {
     const data = new FormData(form)
     const listingId = crypto.randomUUID()
     const photoUrls = await uploadPhotos(listingId)
+
+    const { data: { session } } = await supabaseBrowser.auth.getSession()
+
     const { error } = await supabase.from("property_listings").insert({
       id: listingId,
       title: data.get("title"),
@@ -82,9 +85,11 @@ export default function NewListingPage() {
       listing_type: data.get("listing_type"),
       photos: photoUrls,
       is_verified: false,
+      user_id: session?.user.id ?? null,
     })
+
     if (error) { setError(error.message); setLoading(false); return }
-    router.push("/listings")
+    router.push("/my-listings")
   }
 
   return (

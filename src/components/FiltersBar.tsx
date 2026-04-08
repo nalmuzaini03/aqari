@@ -106,8 +106,6 @@ export default function FiltersBar({
 
   return (
     <div style={{ background: "#0F7A5F" }} className="sticky top-0 z-10 px-4 py-3">
-
-      {/* Filter grid — 3 cols on mobile, all in one row on desktop */}
       <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 mb-2 sm:mb-0">
 
         <select
@@ -216,14 +214,23 @@ export default function FiltersBar({
           )}
         </div>
 
-        {/* Post button */}
-        <a
-          href="/login"
-          style={{ background: "#7FEDD0", color: "#0A5C46" }}
-          className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex items-center justify-center"
-        >
-          + Post
-        </a>
+        {/* Buttons */}
+        <div className="flex gap-2">
+          <a
+            href="/my-listings"
+            style={{ color: "#7FEDD0", border: "1px solid #1D9E75" }}
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex-1 flex items-center justify-center"
+          >
+            My listings
+          </a>
+          <a
+            href="/login"
+            style={{ background: "#7FEDD0", color: "#0A5C46" }}
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-center flex-1 flex items-center justify-center"
+          >
+            + Post
+          </a>
+        </div>
 
       </div>
     </div>
