@@ -32,7 +32,7 @@ export default function SignupPage() {
     }
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) setError(error.message)
-    else router.push("/listings/new")
+    else router.push("/dashboard")
     setLoading(false)
   }
 
