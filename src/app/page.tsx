@@ -175,21 +175,6 @@ export default function HomePage() {
             </button>
           </div>
         </div>
-
-        {/* Stats */}
-        <div className="flex justify-center gap-8 sm:gap-12 flex-wrap">
-          {[
-            { emoji: "🗺️", label: isAr ? "٦ محافظات" : "6 Governorates" },
-            { emoji: "🆓", label: isAr ? "نشر مجاني" : "Free to list" },
-            { emoji: "💬", label: isAr ? "تواصل مباشر عبر واتساب" : "Direct WhatsApp" },
-            { emoji: "✅", label: isAr ? "إعلانات موثقة" : "Verified listings" },
-          ].map((s) => (
-            <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "32px", marginBottom: "6px" }}>{s.emoji}</div>
-              <div style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Browse by area */}
