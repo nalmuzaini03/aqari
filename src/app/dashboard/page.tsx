@@ -141,60 +141,68 @@ export default function DashboardPage() {
               <div className="flex flex-col">
                 {stats.map((listing, i) => (
                   <div key={listing.id} style={{ padding: "16px 24px", borderBottom: i < stats.length - 1 ? "1px solid #EBEBEB" : "none" }}>
-                    <div className="flex items-center gap-4">
-
-                      <div style={{ borderRadius: "10px", background: "#F7F7F7", width: "56px", height: "56px", flexShrink: 0, overflow: "hidden" }}>
-                        {listing.photos && listing.photos.length > 0 ? (
-                          <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-5 h-5" style={{ color: "#DDDDDD" }} fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
-                          {i === 0 && (
-                            <span style={{ background: "#FFF0F2", color: "#FF385C", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", padding: "2px 8px", borderRadius: "20px", flexShrink: 0 }}>
-                              {tr.top}
-                            </span>
+                    <div className="flex flex-col gap-3">
+                      {/* Top row: photo + title + badge */}
+                      <div className="flex items-center gap-3">
+                        <div style={{ borderRadius: "10px", background: "#F7F7F7", width: "48px", height: "48px", flexShrink: 0, overflow: "hidden" }}>
+                          {listing.photos && listing.photos.length > 0 ? (
+                            <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <svg className="w-5 h-5" style={{ color: "#DDDDDD" }} fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                              </svg>
+                            </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span style={{ background: badgeBg(listing.listing_type), color: "white", fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "4px" }}>
-                            {badgeLabel(listing.listing_type)}
-                          </span>
-                          <span style={{ fontSize: "12px", color: "#717171" }}>{priceLabel(listing)} · {listing.area}</span>
-                        </div>
-                        <div style={{ background: "#F7F7F7", borderRadius: "99px", height: "4px" }}>
-                          <div style={{ background: "#FF385C", width: `${(listing.views / maxViews) * 100}%`, borderRadius: "99px", height: "4px" }} />
-                        </div>
-                      </div>
-
-                      <div className="flex gap-5 flex-shrink-0 text-center">
-                        <div>
-                          <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.views}</p>
-                          <p style={{ fontSize: "11px", color: "#717171" }}>{tr.views}</p>
-                        </div>
-                        <div>
-                          <p style={{ fontSize: "18px", fontWeight: 700, color: "#25D366" }}>{listing.clicks}</p>
-                          <p style={{ fontSize: "11px", color: "#717171" }}>{tr.taps}</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
+                            {i === 0 && (
+                              <span style={{ background: "#FFF0F2", color: "#FF385C", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", flexShrink: 0 }}>
+                                {tr.top}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span style={{ background: badgeBg(listing.listing_type), color: "white", fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "4px" }}>
+                              {badgeLabel(listing.listing_type)}
+                            </span>
+                            <span style={{ fontSize: "12px", color: "#717171" }}>{listing.area}</span>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex gap-2 flex-shrink-0">
-                        <Link href={`/listings/${listing.id}`} style={{ fontSize: "12px", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
-                          {tr.view}
-                        </Link>
-                        <Link href="/my-listings" style={{ fontSize: "12px", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
-                          {tr.manage}
-                        </Link>
+                      {/* Progress bar */}
+                      <div style={{ background: "#F7F7F7", borderRadius: "99px", height: "4px" }}>
+                        <div style={{ background: "#FF385C", width: `${(listing.views / maxViews) * 100}%`, borderRadius: "99px", height: "4px" }} />
                       </div>
 
+                      {/* Bottom row: stats + actions */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-4">
+                          <div className="text-center">
+                            <p style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>{listing.views}</p>
+                            <p style={{ fontSize: "11px", color: "#717171" }}>{tr.views}</p>
+                          </div>
+                          <div className="text-center">
+                            <p style={{ fontSize: "16px", fontWeight: 700, color: "#25D366" }}>{listing.clicks}</p>
+                            <p style={{ fontSize: "11px", color: "#717171" }}>{tr.taps}</p>
+                          </div>
+                          <div className="text-center">
+                            <p style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>{priceLabel(listing)}</p>
+                            <p style={{ fontSize: "11px", color: "#717171" }}>{isAr ? "السعر" : "Price"}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Link href={`/listings/${listing.id}`} style={{ fontSize: "12px", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "6px 12px", fontWeight: 500, textDecoration: "none" }}>
+                            {tr.view}
+                          </Link>
+                          <Link href="/my-listings" style={{ fontSize: "12px", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "8px", padding: "6px 12px", fontWeight: 500, textDecoration: "none" }}>
+                            {tr.manage}
+                          </Link>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
