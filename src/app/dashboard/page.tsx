@@ -28,11 +28,13 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<ListingStats[]>([])
   const [loading, setLoading] = useState(true)
   const [userName, setUserName] = useState("")
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) { router.push("/login"); return }
       setUserName(data.session.user.email?.split("@")[0] ?? "")
+      if (data.session.user.email === "nalmuzaini03@gmail.com") setIsAdmin(true)
 
       const { data: listings } = await supabase
         .from("property_listings")
@@ -96,7 +98,9 @@ export default function DashboardPage() {
           >
             {isAr ? "تسجيل خروج" : "Log out"}
           </button>
-          <Link href="/admin" style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>Admin</Link>
+          {isAdmin && (
+            <Link href="/admin" style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>Admin</Link>
+          )}
           <Link href="/listings/new" style={{ background: "#FF385C", color: "white", fontSize: "13px", borderRadius: "24px", fontWeight: 600, padding: "8px 20px", textDecoration: "none" }}>
             {tr.newListing}
           </Link>

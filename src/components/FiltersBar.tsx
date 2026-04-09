@@ -1,9 +1,12 @@
 "use client"
 import { useRouter, usePathname } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import FiltersModal from "./FiltersModal"
 import { useLang } from "@/lib/language-context"
 import { t } from "@/lib/translations"
+import { createClient } from "@/lib/supabase-browser"
+
+const ADMIN_EMAIL = "nalmuzaini03@gmail.com"
 
 type Props = {
   areas: string[]
@@ -23,9 +26,17 @@ export default function FiltersBar({
   const router = useRouter()
   const pathname = usePathname()
   const [modalOpen, setModalOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const supabase = createClient()
   const { lang, setLang } = useLang()
   const tr = t[lang]
   const isAr = lang === "ar"
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user.email === ADMIN_EMAIL) setIsAdmin(true)
+    })
+  }, [])
 
   const activeFilterCount = [
     currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, ...selectedAreas,
@@ -120,9 +131,11 @@ export default function FiltersBar({
               {isAr ? "لوحتي" : "Dashboard"}
             </a>
 
-            <a href="/admin" style={btnStyle}>
-              {isAr ? "الإدارة" : "Admin"}
-            </a>
+            {isAdmin && (
+              <a href="/admin" style={btnStyle}>
+                {isAr ? "الإدارة" : "Admin"}
+              </a>
+            )}
 
             <a href="/listings/new" style={{ background: "#FF385C", color: "white", border: "none", fontSize: "13px", borderRadius: "24px", padding: "7px 16px", fontWeight: 600, whiteSpace: "nowrap" as const, textDecoration: "none" }}>
               {isAr ? "+ نشر" : "+ Post"}
