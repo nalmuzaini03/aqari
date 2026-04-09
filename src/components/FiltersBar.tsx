@@ -116,6 +116,10 @@ export default function FiltersBar({
               )}
             </button>
 
+            <a href="/dashboard" style={btnStyle}>
+              {isAr ? "لوحتي" : "Dashboard"}
+            </a>
+
             <a href="/listings/new" style={{ background: "#FF385C", color: "white", border: "none", fontSize: "13px", borderRadius: "24px", padding: "7px 16px", fontWeight: 600, whiteSpace: "nowrap" as const, textDecoration: "none" }}>
               {isAr ? "+ نشر" : "+ Post"}
             </a>
