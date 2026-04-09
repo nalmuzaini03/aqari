@@ -219,7 +219,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {areas.map(area => (
+            {areas.slice(0, 8).map(area => (
               <button
                 key={area.en}
                 onClick={() => handleAreaClick(area.en)}
@@ -229,6 +229,11 @@ export default function HomePage() {
                 <div style={{ fontSize: "13px", color: "#FF385C", marginTop: "4px", fontWeight: 500 }}>{isAr ? area.en : area.ar}</div>
               </button>
             ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "24px" }}>
+            <Link href="/listings" style={{ fontSize: "14px", color: "#FF385C", fontWeight: 600, textDecoration: "none", border: "1.5px solid #FFD6DF", padding: "10px 24px", borderRadius: "24px" }}>
+              {isAr ? "عرض جميع المناطق ←" : "View all areas →"}
+            </Link>
           </div>
         </div>
       </section>
