@@ -1,9 +1,10 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/language-context"
 import { t } from "@/lib/translations"
+import { createClient } from "@/lib/supabase-browser"
 
 const GOVERNORATES = [
   { en: "All", ar: "الكل" },
@@ -96,6 +97,16 @@ export default function HomePage() {
   const [areaFilter, setAreaFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("")
   const [propertyFilter, setPropertyFilter] = useState("")
+  const [user, setUser] = useState<{ email: string } | null>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) {
+        setUser({ email: data.session.user.email ?? "" })
+      }
+    })
+  }, [])
 
   function handleSearch() {
     const params = new URLSearchParams()
@@ -119,17 +130,27 @@ export default function HomePage() {
         <div style={{ fontSize: "24px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px" }}>aqari</div>
         <div className="flex items-center gap-2">
           <Link href="/listings" style={{ fontSize: "14px", color: "#222", padding: "8px 14px", fontWeight: 500 }} className="hidden sm:block">{tr.browse}</Link>
-
-          {/* Language toggle */}
           <button
             onClick={() => setLang(isAr ? "en" : "ar")}
             style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}
           >
             {isAr ? "English" : "العربية"}
           </button>
-
-          <Link href="/login" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", background: "white", fontWeight: 500 }}>{tr.login}</Link>
-          <Link href="/signup" style={{ fontSize: "14px", color: "white", background: "#FF385C", padding: "8px 20px", borderRadius: "24px", fontWeight: 600 }}>{tr.signup}</Link>
+          {user ? (
+            <>
+              <span style={{ fontSize: "14px", color: "#222", fontWeight: 500 }}>
+                {isAr ? `👋 ${user.email.split("@")[0]}` : `👋 ${user.email.split("@")[0]}`}
+              </span>
+              <Link href="/dashboard" style={{ fontSize: "14px", color: "white", background: "#FF385C", padding: "8px 20px", borderRadius: "24px", fontWeight: 600 }}>
+                {isAr ? "لوحتي" : "Dashboard"}
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", background: "white", fontWeight: 500 }}>{tr.login}</Link>
+              <Link href="/signup" style={{ fontSize: "14px", color: "white", background: "#FF385C", padding: "8px 20px", borderRadius: "24px", fontWeight: 600 }}>{tr.signup}</Link>
+            </>
+          )}
         </div>
       </nav>
 
