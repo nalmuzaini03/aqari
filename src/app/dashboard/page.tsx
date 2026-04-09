@@ -87,6 +87,15 @@ export default function DashboardPage() {
             {isAr ? "English" : "العربية"}
           </button>
           <Link href="/listings" style={{ fontSize: "13px", color: "#222", fontWeight: 500 }}>{tr.browse}</Link>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut()
+              router.push("/")
+            }}
+            style={{ fontSize: "13px", color: "#717171", border: "1px solid #DDDDDD", padding: "7px 16px", borderRadius: "24px", background: "white", fontWeight: 500, cursor: "pointer" }}
+          >
+            {isAr ? "تسجيل خروج" : "Log out"}
+          </button>
           <Link href="/admin" style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>Admin</Link>
           <Link href="/listings/new" style={{ background: "#FF385C", color: "white", fontSize: "13px", borderRadius: "24px", fontWeight: 600, padding: "8px 20px", textDecoration: "none" }}>
             {tr.newListing}
