@@ -59,16 +59,16 @@ export default function ListingsMap({ listings }: Props) {
               onClick={() => setSelectedListing(listing)}
             >
               <div style={{
-                background: isSelected ? "#222" : "white",
-                color: isSelected ? "white" : "#222",
-                border: `2px solid ${isSelected ? "#222" : "#DDDDDD"}`,
+                background: isSelected ? "#222" : "#FF385C",
+                color: "white",
+                border: `2px solid ${isSelected ? "#222" : "#E00B41"}`,
                 borderRadius: "20px",
                 padding: "5px 12px",
                 fontSize: "13px",
                 fontWeight: 700,
                 whiteSpace: "nowrap" as const,
                 cursor: "pointer",
-                boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.25)" : "0 2px 8px rgba(0,0,0,0.12)",
+                boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.25)" : "0 2px 8px rgba(255,56,92,0.3)",
                 transform: isSelected ? "scale(1.1)" : "scale(1)",
                 transition: "all 0.15s ease",
               }}>
