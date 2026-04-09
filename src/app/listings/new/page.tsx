@@ -44,10 +44,12 @@ export default function NewListingPage() {
   const [error, setError] = useState<string | null>(null)
   const [photos, setPhotos] = useState<File[]>([])
   const [listingType, setListingType] = useState("rent")
+  const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
     supabaseBrowser.auth.getSession().then(({ data }) => {
       if (!data.session) router.push("/login")
+      else setAuthed(true)
     })
   }, [])
 
@@ -122,6 +124,7 @@ export default function NewListingPage() {
         <Link href="/listings" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", fontWeight: 500 }}>Browse listings</Link>
       </nav>
 
+      {authed && (
       <div className="max-w-2xl mx-auto px-4 py-10">
 
         <Link href="/listings" style={{ color: "#717171", fontSize: "14px", textDecoration: "none" }} className="flex items-center gap-1 mb-8">
@@ -290,6 +293,7 @@ export default function NewListingPage() {
 
         </form>
       </div>
+      )}
     </div>
   )
 }
