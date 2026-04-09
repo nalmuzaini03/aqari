@@ -97,13 +97,13 @@ export default function HomePage() {
   const [areaFilter, setAreaFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("")
   const [propertyFilter, setPropertyFilter] = useState("")
-  const [user, setUser] = useState<{ email: string } | null>(null)
+  const [user, setUser] = useState<{ name: string } | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user) {
-        setUser({ email: data.session.user.email ?? "" })
+        setUser({ name: data.session.user.email?.split("@")[0] ?? "" })
       }
     })
   }, [])
@@ -139,7 +139,7 @@ export default function HomePage() {
           {user ? (
             <>
               <span style={{ fontSize: "14px", color: "#222", fontWeight: 500 }}>
-                {isAr ? `👋 ${user.email.split("@")[0]}` : `👋 ${user.email.split("@")[0]}`}
+                👋 {user.name}
               </span>
               <Link href="/dashboard" style={{ fontSize: "14px", color: "white", background: "#FF385C", padding: "8px 20px", borderRadius: "24px", fontWeight: 600 }}>
                 {isAr ? "لوحتي" : "Dashboard"}
