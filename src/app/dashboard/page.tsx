@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase-browser"
 import Link from "next/link"
+import { useLang } from "@/lib/language-context"
+import { t } from "@/lib/translations"
 
 type ListingStats = {
   id: string
@@ -19,6 +21,10 @@ type ListingStats = {
 export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { lang, setLang } = useLang()
+  const tr = t[lang]
+  const isAr = lang === "ar"
+
   const [stats, setStats] = useState<ListingStats[]>([])
   const [loading, setLoading] = useState(true)
   const [userName, setUserName] = useState("")
@@ -26,7 +32,7 @@ export default function DashboardPage() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) { router.push("/login"); return }
-      setUserName(data.session.user.email?.split("@")[0] ?? "there")
+      setUserName(data.session.user.email?.split("@")[0] ?? "")
 
       const { data: listings } = await supabase
         .from("property_listings")
@@ -59,11 +65,11 @@ export default function DashboardPage() {
   const badgeBg = (type: string) =>
     type === "rent" ? "#FF385C" : type === "short_stay" ? "#7C3AED" : "#222"
   const badgeLabel = (type: string) =>
-    type === "rent" ? "For rent" : type === "short_stay" ? "Short stay" : "For sale"
+    type === "rent" ? tr.forRentBadge : type === "short_stay" ? tr.shortStayBadge : tr.forSaleBadge
   const priceLabel = (l: ListingStats) =>
     l.listing_type === "short_stay"
-      ? `${(l.price_per_night ?? l.price).toLocaleString()} KWD / night`
-      : `${l.price.toLocaleString()} KWD${l.listing_type === "rent" ? " / month" : ""}`
+      ? `${(l.price_per_night ?? l.price).toLocaleString()} ${isAr ? "د.ك" : "KWD"} ${tr.perNight}`
+      : `${l.price.toLocaleString()} ${isAr ? "د.ك" : "KWD"}${l.listing_type === "rent" ? ` ${tr.perMonth}` : ""}`
 
   return (
     <div style={{ background: "#F7F7F7", minHeight: "100vh" }}>
@@ -71,12 +77,18 @@ export default function DashboardPage() {
       <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
-          <span style={{ fontSize: "11px", color: "#AAAAAA", letterSpacing: "1.5px", fontWeight: 600 }}>DASHBOARD</span>
+          <span style={{ fontSize: "11px", color: "#AAAAAA", letterSpacing: "1.5px", fontWeight: 600 }}>{tr.dashboard}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/listings" style={{ fontSize: "13px", color: "#222", fontWeight: 500 }}>Browse</Link>
+          <button
+            onClick={() => setLang(isAr ? "en" : "ar")}
+            style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}
+          >
+            {isAr ? "English" : "العربية"}
+          </button>
+          <Link href="/listings" style={{ fontSize: "13px", color: "#222", fontWeight: 500 }}>{tr.browse}</Link>
           <Link href="/listings/new" style={{ background: "#FF385C", color: "white", fontSize: "13px", borderRadius: "24px", fontWeight: 600, padding: "8px 20px", textDecoration: "none" }}>
-            + New listing
+            {tr.newListing}
           </Link>
         </div>
       </nav>
@@ -85,30 +97,31 @@ export default function DashboardPage() {
 
         <div className="mb-8">
           <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#222", letterSpacing: "-0.5px" }}>
-            Welcome back, {userName} 👋
+            {isAr ? `👋 ${tr.welcomeBack2}، ${userName}` : `${tr.welcomeBack2}, ${userName} 👋`}
           </h1>
-          <p style={{ fontSize: "15px", color: "#717171", marginTop: "4px" }}>Here's how your listings are performing</p>
+          <p style={{ fontSize: "15px", color: "#717171", marginTop: "4px" }}>{tr.performanceDesc}</p>
         </div>
 
         {loading ? (
-          <p style={{ fontSize: "14px", color: "#717171" }}>Loading your dashboard...</p>
+          <p style={{ fontSize: "14px", color: "#717171" }}>{tr.loading}</p>
         ) : stats.length === 0 ? (
           <div style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px" }} className="p-12 text-center">
             <div style={{ fontSize: "48px", marginBottom: "16px" }}>🏠</div>
-            <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }} className="mb-2">No listings yet</p>
-            <p style={{ fontSize: "14px", color: "#717171" }} className="mb-6">Post your first listing to start seeing analytics</p>
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }} className="mb-2">{tr.noListingsYet}</p>
+            <p style={{ fontSize: "14px", color: "#717171" }} className="mb-6">{tr.noListingsDashSub}</p>
             <Link href="/listings/new" style={{ background: "#FF385C", color: "white", fontSize: "14px", borderRadius: "8px", fontWeight: 700, padding: "12px 28px", textDecoration: "none" }}>
-              Post a listing
+              {tr.postTitle}
             </Link>
           </div>
         ) : (
           <>
+            {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                { label: "Total views", value: totalViews.toLocaleString(), icon: "👁" },
-                { label: "WhatsApp taps", value: totalClicks.toLocaleString(), icon: "💬" },
-                { label: "Active listings", value: stats.length.toString(), icon: "🏠" },
-                { label: "Conversion rate", value: `${conversionRate}%`, icon: "📈" },
+                { label: tr.totalViews, value: totalViews.toLocaleString(), icon: "👁" },
+                { label: tr.whatsappTaps, value: totalClicks.toLocaleString(), icon: "💬" },
+                { label: tr.activeListings, value: stats.length.toString(), icon: "🏠" },
+                { label: tr.conversionRate, value: `${conversionRate}%`, icon: "📈" },
               ].map(s => (
                 <div key={s.label} style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px", padding: "20px" }}>
                   <div style={{ fontSize: "24px", marginBottom: "8px" }}>{s.icon}</div>
@@ -118,10 +131,11 @@ export default function DashboardPage() {
               ))}
             </div>
 
+            {/* Listing performance */}
             <div style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px", overflow: "hidden", marginBottom: "16px" }}>
               <div style={{ padding: "20px 24px", borderBottom: "1px solid #EBEBEB", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <p style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>Listing performance</p>
-                <Link href="/listings/new" style={{ fontSize: "13px", color: "#FF385C", fontWeight: 600, textDecoration: "none" }}>+ Add listing</Link>
+                <p style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>{tr.listingPerformance}</p>
+                <Link href="/listings/new" style={{ fontSize: "13px", color: "#FF385C", fontWeight: 600, textDecoration: "none" }}>{tr.addListing}</Link>
               </div>
 
               <div className="flex flex-col">
@@ -146,7 +160,7 @@ export default function DashboardPage() {
                           <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
                           {i === 0 && (
                             <span style={{ background: "#FFF0F2", color: "#FF385C", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", padding: "2px 8px", borderRadius: "20px", flexShrink: 0 }}>
-                              TOP
+                              {tr.top}
                             </span>
                           )}
                         </div>
@@ -164,20 +178,20 @@ export default function DashboardPage() {
                       <div className="flex gap-5 flex-shrink-0 text-center">
                         <div>
                           <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.views}</p>
-                          <p style={{ fontSize: "11px", color: "#717171" }}>Views</p>
+                          <p style={{ fontSize: "11px", color: "#717171" }}>{tr.views}</p>
                         </div>
                         <div>
                           <p style={{ fontSize: "18px", fontWeight: 700, color: "#25D366" }}>{listing.clicks}</p>
-                          <p style={{ fontSize: "11px", color: "#717171" }}>Taps</p>
+                          <p style={{ fontSize: "11px", color: "#717171" }}>{tr.taps}</p>
                         </div>
                       </div>
 
                       <div className="flex gap-2 flex-shrink-0">
                         <Link href={`/listings/${listing.id}`} style={{ fontSize: "12px", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
-                          View
+                          {tr.view}
                         </Link>
                         <Link href="/my-listings" style={{ fontSize: "12px", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
-                          Manage
+                          {tr.manage}
                         </Link>
                       </div>
 
@@ -187,11 +201,12 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Quick actions */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { href: "/listings/new", icon: "➕", title: "New listing", desc: "Post a property for free" },
-                { href: "/my-listings", icon: "📋", title: "My listings", desc: "Edit or delete listings" },
-                { href: "/listings", icon: "🔍", title: "Browse market", desc: "See what's listed in Kuwait" },
+                { href: "/listings/new", icon: "➕", title: tr.newListing, desc: tr.newListingDesc },
+                { href: "/my-listings", icon: "📋", title: tr.myListings, desc: tr.myListingsDesc },
+                { href: "/listings", icon: "🔍", title: tr.browseMarket, desc: tr.browseMarketDesc },
               ].map(a => (
                 <Link key={a.href} href={a.href} style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px", padding: "20px", textDecoration: "none", display: "block" }}>
                   <div style={{ fontSize: "24px", marginBottom: "8px" }}>{a.icon}</div>
