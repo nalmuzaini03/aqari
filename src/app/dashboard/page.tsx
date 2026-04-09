@@ -87,6 +87,7 @@ export default function DashboardPage() {
             {isAr ? "English" : "العربية"}
           </button>
           <Link href="/listings" style={{ fontSize: "13px", color: "#222", fontWeight: 500 }}>{tr.browse}</Link>
+          <Link href="/admin" style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>Admin</Link>
           <Link href="/listings/new" style={{ background: "#FF385C", color: "white", fontSize: "13px", borderRadius: "24px", fontWeight: 600, padding: "8px 20px", textDecoration: "none" }}>
             {tr.newListing}
           </Link>
