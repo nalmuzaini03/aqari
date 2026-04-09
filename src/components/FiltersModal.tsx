@@ -1,6 +1,8 @@
 "use client"
 import React, { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { useLang } from "@/lib/language-context"
+import { t } from "@/lib/translations"
 
 type Props = {
   areas: string[]
@@ -24,12 +26,27 @@ const PROPERTY_ICONS: Record<string, React.ReactElement> = {
   land: <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>,
 }
 
+const PROPERTY_LABELS: Record<string, { en: string; ar: string }> = {
+  apartment: { en: "Apartment", ar: "شقة" },
+  villa: { en: "Villa", ar: "فيلا" },
+  floor: { en: "Floor", ar: "طابق" },
+  building: { en: "Building", ar: "عمارة" },
+  chalet: { en: "Chalet", ar: "شاليه" },
+  office: { en: "Office", ar: "مكتب" },
+  shop: { en: "Shop", ar: "محل" },
+  land: { en: "Land", ar: "أرض" },
+}
+
 export default function FiltersModal({
   areas, propertyTypes, selectedAreas,
   currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, onClose,
 }: Props) {
   const router = useRouter()
   const pathname = usePathname()
+  const { lang } = useLang()
+  const tr = t[lang]
+  const isAr = lang === "ar"
+
   const [listingType, setListingType] = useState(currentListingType)
   const [propertyType, setPropertyType] = useState(currentPropertyType)
   const [localAreas, setLocalAreas] = useState<string[]>(selectedAreas)
@@ -61,9 +78,19 @@ export default function FiltersModal({
     onClose()
   }
 
-  const formatPrice = (val: number) => val >= priceMax ? (isForSale ? "2,000,000+ KWD" : "10,000+ KWD") : `${val.toLocaleString()} KWD`
+  const formatPrice = (val: number) => {
+    if (val >= priceMax) return isForSale ? (isAr ? "+٢،٠٠٠،٠٠٠ د.ك" : "2,000,000+ KWD") : (isAr ? "+١٠،٠٠٠ د.ك" : "10,000+ KWD")
+    return isAr ? `${val.toLocaleString()} د.ك` : `${val.toLocaleString()} KWD`
+  }
 
   const sectionLabel = { fontSize: "11px", color: "#717171", letterSpacing: "1px", marginBottom: "12px", fontWeight: 600 }
+
+  const listingTypes = [
+    { val: "", label: isAr ? "الكل" : "All" },
+    { val: "rent", label: isAr ? "للإيجار" : "For rent" },
+    { val: "short_stay", label: isAr ? "إقامة قصيرة" : "Short stay" },
+    { val: "sale", label: isAr ? "للبيع" : "For sale" },
+  ]
 
   return (
     <div
@@ -74,7 +101,7 @@ export default function FiltersModal({
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid #EBEBEB" }}>
-          <span style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>Filters</span>
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "#222" }}>{tr.filters}</span>
           <button onClick={onClose} style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#F7F7F7", border: "1px solid #EBEBEB", cursor: "pointer", fontSize: "18px", color: "#222", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
         </div>
 
@@ -83,12 +110,12 @@ export default function FiltersModal({
 
           {/* Listing type */}
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
-            <p style={sectionLabel}>LISTING TYPE</p>
+            <p style={sectionLabel}>{tr.listingType}</p>
             <div style={{ display: "flex", gap: "8px" }}>
-              {[{ val: "", label: "All" }, { val: "rent", label: "For rent" }, { val: "short_stay", label: "Short stay" }, { val: "sale", label: "For sale" }].map(t => (
-                <button key={t.val} onClick={() => { setListingType(t.val); setMaxPrice(-1) }}
-                  style={{ flex: 1, padding: "10px", borderRadius: "8px", border: listingType === t.val ? "2px solid #222" : "1px solid #DDDDDD", background: "white", color: "#222", fontSize: "13px", cursor: "pointer", fontWeight: listingType === t.val ? 700 : 400 }}>
-                  {t.label}
+              {listingTypes.map(lt => (
+                <button key={lt.val} onClick={() => { setListingType(lt.val); setMaxPrice(-1) }}
+                  style={{ flex: 1, padding: "10px", borderRadius: "8px", border: listingType === lt.val ? "2px solid #222" : "1px solid #DDDDDD", background: "white", color: "#222", fontSize: "13px", cursor: "pointer", fontWeight: listingType === lt.val ? 700 : 400 }}>
+                  {lt.label}
                 </button>
               ))}
             </div>
@@ -96,13 +123,15 @@ export default function FiltersModal({
 
           {/* Property type */}
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
-            <p style={sectionLabel}>PROPERTY TYPE</p>
+            <p style={sectionLabel}>{tr.propertyType}</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
-              {propertyTypes.map(t => (
-                <button key={t} onClick={() => setPropertyType(propertyType === t ? "" : t)}
-                  style={{ border: propertyType === t ? "2px solid #222" : "1px solid #DDDDDD", borderRadius: "8px", padding: "12px 6px", background: "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", color: propertyType === t ? "#222" : "#717171" }}>
-                  {PROPERTY_ICONS[t]}
-                  <span style={{ fontSize: "11px", fontWeight: propertyType === t ? 600 : 400 }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
+              {propertyTypes.map(pt => (
+                <button key={pt} onClick={() => setPropertyType(propertyType === pt ? "" : pt)}
+                  style={{ border: propertyType === pt ? "2px solid #222" : "1px solid #DDDDDD", borderRadius: "8px", padding: "12px 6px", background: "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", color: propertyType === pt ? "#222" : "#717171" }}>
+                  {PROPERTY_ICONS[pt]}
+                  <span style={{ fontSize: "11px", fontWeight: propertyType === pt ? 600 : 400 }}>
+                    {isAr ? (PROPERTY_LABELS[pt]?.ar ?? pt) : (PROPERTY_LABELS[pt]?.en ?? pt)}
+                  </span>
                 </button>
               ))}
             </div>
@@ -110,17 +139,17 @@ export default function FiltersModal({
 
           {/* Bedrooms */}
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
-            <p style={sectionLabel}>BEDROOMS</p>
+            <p style={sectionLabel}>{tr.bedrooms}</p>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p style={{ fontSize: "14px", color: "#222", fontWeight: 500 }}>Bedrooms</p>
-                <p style={{ fontSize: "12px", color: "#717171", marginTop: "2px" }}>Minimum number</p>
+                <p style={{ fontSize: "14px", color: "#222", fontWeight: 500 }}>{tr.bedrooms}</p>
+                <p style={{ fontSize: "12px", color: "#717171", marginTop: "2px" }}>{tr.minimum}</p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                 <button onClick={() => setBedrooms(b => Math.max(-1, b - 1))}
                   style={{ width: "32px", height: "32px", borderRadius: "50%", border: `1.5px solid ${bedrooms <= -1 ? "#DDDDDD" : "#222"}`, background: "transparent", cursor: bedrooms <= -1 ? "default" : "pointer", color: bedrooms <= -1 ? "#DDDDDD" : "#222", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
                 <span style={{ fontSize: "16px", fontWeight: 600, color: "#222", minWidth: "40px", textAlign: "center" }}>
-                  {bedrooms === -1 ? "Any" : bedrooms === 0 ? "Studio" : bedrooms}
+                  {bedrooms === -1 ? (isAr ? "أي" : "Any") : bedrooms === 0 ? (isAr ? "استوديو" : "Studio") : bedrooms}
                 </span>
                 <button onClick={() => setBedrooms(b => Math.min(6, b + 1))}
                   style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px solid #222", background: "transparent", cursor: "pointer", color: "#222", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
@@ -130,22 +159,22 @@ export default function FiltersModal({
 
           {/* Price */}
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
-            <p style={sectionLabel}>MAX PRICE</p>
+            <p style={sectionLabel}>{tr.maxPrice}</p>
             <p style={{ fontSize: "22px", fontWeight: 700, color: "#222", marginBottom: "16px" }}>
-              {maxPrice === -1 ? "Any price" : formatPrice(sliderValue)}
+              {maxPrice === -1 ? tr.anyPrice : formatPrice(sliderValue)}
             </p>
             <input type="range" min={priceMin} max={priceMax} step={priceStep} value={sliderValue}
               onChange={e => setMaxPrice(Number(e.target.value))}
               style={{ width: "100%", accentColor: "#FF385C" }} />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
-              <span style={{ fontSize: "11px", color: "#717171" }}>{priceMin.toLocaleString()} KWD</span>
-              <span style={{ fontSize: "11px", color: "#717171" }}>{isForSale ? "2,000,000+ KWD" : "10,000+ KWD"}</span>
+              <span style={{ fontSize: "11px", color: "#717171" }}>{isAr ? `${priceMin.toLocaleString()} د.ك` : `${priceMin.toLocaleString()} KWD`}</span>
+              <span style={{ fontSize: "11px", color: "#717171" }}>{isForSale ? (isAr ? "+٢،٠٠٠،٠٠٠ د.ك" : "2,000,000+ KWD") : (isAr ? "+١٠،٠٠٠ د.ك" : "10,000+ KWD")}</span>
             </div>
           </div>
 
           {/* Areas */}
           <div>
-            <p style={sectionLabel}>AREA</p>
+            <p style={sectionLabel}>{tr.areaLabel}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {areas.map(area => (
                 <button key={area} onClick={() => toggleArea(area)}
@@ -161,10 +190,10 @@ export default function FiltersModal({
         {/* Footer */}
         <div style={{ padding: "16px 24px", borderTop: "1px solid #EBEBEB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <button onClick={clearAll} style={{ fontSize: "13px", color: "#222", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontWeight: 600 }}>
-            Clear all
+            {tr.clearAll}
           </button>
           <button onClick={apply} style={{ background: "#FF385C", color: "white", border: "none", borderRadius: "8px", padding: "12px 28px", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
-            Show listings
+            {tr.showListings}
           </button>
         </div>
 
