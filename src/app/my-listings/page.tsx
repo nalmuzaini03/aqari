@@ -115,6 +115,9 @@ export default function MyListingsPage() {
                   <Link href={`/listings/${l.id}`} style={{ color: "#222", border: "1px solid #DDDDDD", fontSize: "12px", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
                     {tr.view}
                   </Link>
+                  <Link href={`/listings/${l.id}/edit`} style={{ color: "#222", border: "1px solid #DDDDDD", fontSize: "12px", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
+                    {isAr ? "تعديل" : "Edit"}
+                  </Link>
                   <button
                     onClick={() => deleteListing(l.id)}
                     disabled={deletingId === l.id}
