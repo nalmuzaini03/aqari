@@ -179,14 +179,14 @@ export default function HomePage() {
         {/* Stats */}
         <div className="flex justify-center gap-8 sm:gap-12 flex-wrap">
           {[
-            { num: "6", label: tr.governorates },
-            { num: isAr ? "مجاني" : "Free", label: tr.freeToList },
-            { num: isAr ? "مباشر" : "Direct", label: tr.direct },
-            { num: isAr ? "موثق" : "Verified", label: tr.verified },
+            { emoji: "🗺️", label: isAr ? "٦ محافظات" : "6 Governorates" },
+            { emoji: "🆓", label: isAr ? "نشر مجاني" : "Free to list" },
+            { emoji: "💬", label: isAr ? "تواصل مباشر عبر واتساب" : "Direct WhatsApp" },
+            { emoji: "✅", label: isAr ? "إعلانات موثقة" : "Verified listings" },
           ].map((s) => (
             <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "26px", fontWeight: 800, color: "#222" }}>{s.num}</div>
-              <div style={{ fontSize: "13px", color: "#717171", marginTop: "3px" }}>{s.label}</div>
+              <div style={{ fontSize: "32px", marginBottom: "6px" }}>{s.emoji}</div>
+              <div style={{ fontSize: "13px", color: "#717171", fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
         </div>
