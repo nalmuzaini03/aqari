@@ -9,6 +9,8 @@ import ShortStayBooking from "@/components/ShortStayBooking"
 type Listing = {
   id: string
   title: string
+  title_ar: string | null
+  title_en: string | null
   area: string
   price: number
   price_per_night: number | null
@@ -18,6 +20,8 @@ type Listing = {
   bathrooms: number | null
   property_type: string
   description: string | null
+  description_ar: string | null
+  description_en: string | null
   photos: string[]
   phone_number: string
 }
@@ -94,7 +98,9 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
                   </span>
                 )}
               </div>
-              <h1 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "#222", lineHeight: 1.2 }}>{listing.title}</h1>
+              <h1 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "#222", lineHeight: 1.2 }}>
+                {isAr ? (listing.title_ar || listing.title) : (listing.title_en || listing.title)}
+              </h1>
               <p style={{ fontSize: "14px", color: "#717171" }} className="mt-2 flex items-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"/>
@@ -141,7 +147,9 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
           {listing.description && (
             <div style={{ borderTop: "1px solid #EBEBEB" }} className="pt-5">
               <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px", fontWeight: 600 }} className="mb-2">{tr.descriptionLabel}</p>
-              <p style={{ fontSize: "15px", color: "#222", lineHeight: 1.7 }}>{listing.description}</p>
+              <p style={{ fontSize: "15px", color: "#222", lineHeight: 1.7 }}>
+                {isAr ? (listing.description_ar || listing.description) : (listing.description_en || listing.description)}
+              </p>
             </div>
           )}
         </div>

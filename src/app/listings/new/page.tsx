@@ -98,13 +98,61 @@ export default function NewListingPage() {
     const photoUrls = await uploadPhotos(listingId)
     const { data: { session } } = await supabaseBrowser.auth.getSession()
 
+    const title = data.get("title") as string
+    const description = data.get("description") as string
     const pricePerNight = listingType === "short_stay" ? Number(data.get("price_per_night")) : null
     const price = listingType === "short_stay" ? (pricePerNight ?? 0) : Number(data.get("price"))
 
+    // Auto-translate title and description
+    const detectedLang = isAr ? "ar" : "en"
+    const targetLang = isAr ? "en" : "ar"
+
+    let title_ar = "", title_en = "", description_ar = "", description_en = ""
+
+    try {
+      const [titleRes, descRes] = await Promise.all([
+        fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: title, targetLang }),
+        }),
+        description ? fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: description, targetLang }),
+        }) : Promise.resolve(null),
+      ])
+
+      const titleData = await titleRes.json()
+      const descData = descRes ? await descRes.json() : { translated: "" }
+
+      if (detectedLang === "ar") {
+        title_ar = title
+        title_en = titleData.translated
+        description_ar = description
+        description_en = descData.translated
+      } else {
+        title_en = title
+        title_ar = titleData.translated
+        description_en = description
+        description_ar = descData.translated
+      }
+    } catch {
+      // If translation fails, just use original for both
+      title_ar = title
+      title_en = title
+      description_ar = description
+      description_en = description
+    }
+
     const { error } = await supabase.from("property_listings").insert({
       id: listingId,
-      title: data.get("title"),
-      description: data.get("description"),
+      title,
+      title_ar,
+      title_en,
+      description,
+      description_ar,
+      description_en,
       price,
       price_per_night: pricePerNight,
       area: data.get("area"),
@@ -117,6 +165,7 @@ export default function NewListingPage() {
       is_verified: false,
       user_id: session?.user.id ?? null,
     })
+
     if (error) { setError(error.message); setLoading(false); return }
     router.push("/my-listings")
   }
@@ -331,7 +380,7 @@ export default function NewListingPage() {
             <button type="submit" disabled={loading}
               style={{ background: loading ? "#DDDDDD" : "#FF385C", color: "white", borderRadius: "8px", fontSize: "15px", border: "none", fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", padding: "14px" }}
               className="w-full mt-2">
-              {loading ? tr.posting : tr.postBtn2}
+              {loading ? (isAr ? "جاري الترجمة والنشر..." : "Translating & posting...") : tr.postBtn2}
             </button>
 
           </form>
