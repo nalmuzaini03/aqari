@@ -9,8 +9,12 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-  title: "Aqari — Kuwait Property Marketplace | عقاري",
-  description: "Browse verified properties across all Kuwait governorates. Rent, buy or book a chalet. Connect directly with owners via WhatsApp.",
+  title: "Aqari | Kuwait Property Marketplace — عقاري",
+  description: "Browse verified apartments, villas, chalets and offices for rent and sale across all Kuwait governorates.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
