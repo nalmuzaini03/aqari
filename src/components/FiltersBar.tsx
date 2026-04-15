@@ -76,7 +76,7 @@ export default function FiltersBar({
   return (
     <>
       <div style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="sticky top-0 z-10 px-4 sm:px-6 py-3">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
 
           {/* Logo */}
           <a href="/" style={{ fontSize: "18px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", marginRight: "8px", textDecoration: "none" }}>aqari</a>

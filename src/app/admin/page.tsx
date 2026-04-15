@@ -236,47 +236,46 @@ export default function AdminPage() {
                 <div className="flex flex-col">
                   {filtered.map((listing, i) => (
                     <div key={listing.id} style={{ padding: "16px 24px", borderBottom: i < filtered.length - 1 ? "1px solid #EBEBEB" : "none" }}>
-                      <div className="flex items-center gap-4">
-
-                        {/* Thumbnail */}
-                        <div style={{ borderRadius: "8px", background: "#F7F7F7", width: "56px", height: "56px", flexShrink: 0, overflow: "hidden" }}>
-                          {listing.photos && listing.photos.length > 0 ? (
-                            <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <svg className="w-5 h-5" style={{ color: "#DDDDDD" }} fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
-                            {listing.is_verified && (
-                              <span style={{ background: "#E8F8EF", color: "#25D366", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px" }}>✓ Verified</span>
+                      <div className="flex flex-col gap-3">
+                        {/* Top: photo + title + badges */}
+                        <div className="flex items-center gap-3">
+                          <div style={{ borderRadius: "8px", background: "#F7F7F7", width: "56px", height: "56px", flexShrink: 0, overflow: "hidden" }}>
+                            {listing.photos && listing.photos.length > 0 ? (
+                              <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <svg className="w-5 h-5" style={{ color: "#DDDDDD" }} fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                                </svg>
+                              </div>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span style={{ background: badgeBg(listing.listing_type), color: "white", fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "4px" }}>
-                              {badgeLabel(listing.listing_type)}
-                            </span>
-                            <span style={{ fontSize: "12px", color: "#717171" }}>
-                              {listing.listing_type === "short_stay"
-                                ? `${(listing.price_per_night ?? listing.price).toLocaleString()} KWD / night`
-                                : `${listing.price.toLocaleString()} KWD${listing.listing_type === "rent" ? " / month" : ""}`
-                              } · {listing.area} · {listing.property_type}
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <p style={{ fontSize: "14px", fontWeight: 600, color: "#222" }} className="truncate">{listing.title}</p>
+                              {listing.is_verified && (
+                                <span style={{ background: "#E8F8EF", color: "#25D366", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", flexShrink: 0 }}>✓ Verified</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span style={{ background: badgeBg(listing.listing_type), color: "white", fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "4px" }}>
+                                {badgeLabel(listing.listing_type)}
+                              </span>
+                              <span style={{ fontSize: "12px", color: "#717171" }}>
+                                {listing.listing_type === "short_stay"
+                                  ? `${(listing.price_per_night ?? listing.price).toLocaleString()} KWD / night`
+                                  : `${listing.price.toLocaleString()} KWD${listing.listing_type === "rent" ? " / month" : ""}`
+                                } · {listing.area}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: "11px", color: "#AAAAAA", marginTop: "4px", direction: "ltr" }}>
+                              {listing.phone_number} · {new Date(listing.created_at).toLocaleDateString()}
+                            </p>
                           </div>
-                          <p style={{ fontSize: "11px", color: "#AAAAAA", marginTop: "4px" }}>
-                            {listing.phone_number} · {new Date(listing.created_at).toLocaleDateString()}
-                          </p>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-2 flex-shrink-0 flex-wrap justify-end">
+                        {/* Bottom: actions */}
+                        <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => toggleVerified(listing.id, listing.is_verified)}
                             disabled={togglingId === listing.id}
@@ -284,7 +283,7 @@ export default function AdminPage() {
                               background: listing.is_verified ? "#F7F7F7" : "#E8F8EF",
                               color: listing.is_verified ? "#717171" : "#25D366",
                               border: `1px solid ${listing.is_verified ? "#DDDDDD" : "#25D366"}`,
-                              fontSize: "12px", borderRadius: "8px", padding: "6px 14px",
+                              fontSize: "12px", borderRadius: "8px", padding: "8px 16px",
                               fontWeight: 600, cursor: "pointer",
                               opacity: togglingId === listing.id ? 0.5 : 1,
                             }}
@@ -292,18 +291,17 @@ export default function AdminPage() {
                             {togglingId === listing.id ? "..." : listing.is_verified ? "Unverify" : "✓ Verify"}
                           </button>
                           <Link href={`/listings/${listing.id}`}
-                            style={{ color: "#222", border: "1px solid #DDDDDD", fontSize: "12px", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, textDecoration: "none" }}>
+                            style={{ color: "#222", border: "1px solid #DDDDDD", fontSize: "12px", borderRadius: "8px", padding: "8px 16px", fontWeight: 500, textDecoration: "none" }}>
                             View
                           </Link>
                           <button
                             onClick={() => deleteListing(listing.id)}
                             disabled={deletingId === listing.id}
-                            style={{ background: "#FFF0F2", color: "#C4001B", border: "1px solid #FFD6DF", fontSize: "12px", borderRadius: "8px", padding: "6px 14px", fontWeight: 500, cursor: "pointer", opacity: deletingId === listing.id ? 0.5 : 1 }}
+                            style={{ background: "#FFF0F2", color: "#C4001B", border: "1px solid #FFD6DF", fontSize: "12px", borderRadius: "8px", padding: "8px 16px", fontWeight: 500, cursor: "pointer", opacity: deletingId === listing.id ? 0.5 : 1 }}
                           >
                             {deletingId === listing.id ? "..." : "Delete"}
                           </button>
                         </div>
-
                       </div>
                     </div>
                   ))}
