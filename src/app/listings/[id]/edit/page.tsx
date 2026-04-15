@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { supabase } from "@/lib/supabase"
 import { createClient } from "@/lib/supabase-browser"
 import { KUWAIT_AREAS, PROPERTY_TYPES } from "@/lib/constants"
 import Link from "next/link"
@@ -49,7 +48,7 @@ export default function EditListingPage() {
     supabaseBrowser.auth.getSession().then(async ({ data }) => {
       if (!data.session) { router.push("/login"); return }
 
-      const { data: listing } = await supabase
+      const { data: listing } = await supabaseBrowser
         .from("property_listings")
         .select("*")
         .eq("id", id)
@@ -82,7 +81,7 @@ export default function EditListingPage() {
     const pricePerNight = listingType === "short_stay" ? Number(form.price_per_night) : null
     const price = listingType === "short_stay" ? (pricePerNight ?? 0) : Number(form.price)
 
-    const { error } = await supabase.from("property_listings").update({
+    const { error } = await supabaseBrowser.from("property_listings").update({
       title: form.title,
       description: form.description,
       price,
