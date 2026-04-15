@@ -56,7 +56,7 @@ export default function AdminPage() {
 
   async function toggleVerified(id: string, current: boolean) {
     setTogglingId(id)
-    await supabase.from("property_listings").update({ is_verified: !current }).eq("id", id)
+    await supabaseBrowser.from("property_listings").update({ is_verified: !current }).eq("id", id)
     setListings(listings.map(l => l.id === id ? { ...l, is_verified: !current } : l))
     setTogglingId(null)
   }
@@ -113,8 +113,10 @@ export default function AdminPage() {
   async function deleteListing(id: string) {
     if (!confirm("Are you sure you want to delete this listing?")) return
     setDeletingId(id)
-    await supabase.from("property_listings").delete().eq("id", id)
-    setListings(listings.filter(l => l.id !== id))
+    const { error } = await supabaseBrowser.from("property_listings").delete().eq("id", id)
+    if (!error) {
+      setListings(listings.filter(l => l.id !== id))
+    }
     setDeletingId(null)
   }
 
