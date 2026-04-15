@@ -138,7 +138,12 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
               </div>
             )}
             <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB" }} className="p-3 text-center">
-              <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }} className="capitalize">{listing.property_type}</p>
+              <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }} className="capitalize">
+                {isAr ? ({
+                  apartment: "شقة", villa: "فيلا", floor: "طابق", building: "عمارة",
+                  chalet: "شاليه", office: "مكتب", shop: "محل", land: "أرض"
+                }[listing.property_type] ?? listing.property_type) : listing.property_type}
+              </p>
               <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px" }} className="mt-0.5">{tr.typeLabel}</p>
             </div>
           </div>

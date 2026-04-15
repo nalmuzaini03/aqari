@@ -27,7 +27,7 @@ export default function WhatsAppButton({ listingId, whatsappLink, phoneNumber }:
         </svg>
         Contact on WhatsApp
       </button>
-      <p style={{ fontSize: "12px", color: "#717171", textAlign: "center", marginTop: "8px" }}>{phoneNumber}</p>
+      <p style={{ fontSize: "12px", color: "#717171", textAlign: "center", marginTop: "8px", direction: "ltr" }}>{phoneNumber}</p>
     </div>
   )
 }
