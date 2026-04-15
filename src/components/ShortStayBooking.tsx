@@ -10,7 +10,7 @@ type Props = {
   pricePerNight: number
 }
 
-export default function ShortStayBooking({ phoneNumber, title, pricePerNight }: Props) {
+export default function ShortStayBooking({ listingId, phoneNumber, title, pricePerNight }: Props) {
   const { lang } = useLang()
   const tr = t[lang]
   const isAr = lang === "ar"
@@ -29,13 +29,15 @@ export default function ShortStayBooking({ phoneNumber, title, pricePerNight }: 
 
   function handleWhatsApp() {
     const number = phoneNumber.replace(/\D/g, "")
+    const listingUrl = `https://getaqari.com/listings/${listingId}`
+
     const message = checkIn && checkOut
       ? isAr
-        ? `مرحباً، أود حجز "${title}" من ${checkIn} إلى ${checkOut} (${nights} ${nightLabel}). هل هو متاح؟`
-        : `Hi, I'd like to book "${title}" from ${checkIn} to ${checkOut} (${nights} ${nightLabel}). Is it available?`
+        ? `السلام عليكم 👋\n\nأود حجز الشاليه على *عقاري*:\n\n🏠 *${title}*\n📅 من ${checkIn} إلى ${checkOut}\n🌙 ${nights} ${nightLabel}\n💰 ${total.toLocaleString()} د.ك إجمالي\n\n🔗 ${listingUrl}\n\nهل هو متاح؟`
+        : `Hello 👋\n\nI'd like to book this property on *Aqari*:\n\n🏠 *${title}*\n📅 From ${checkIn} to ${checkOut}\n🌙 ${nights} ${nightLabel}\n💰 ${total.toLocaleString()} KWD total\n\n🔗 ${listingUrl}\n\nIs it available?`
       : isAr
-        ? `مرحباً، أنا مهتم بإعلانك: ${title}`
-        : `Hi, I'm interested in your listing: ${title}`
+        ? `السلام عليكم 👋\n\nأنا مهتم بإعلانك على *عقاري*:\n\n🏠 *${title}*\n\n🔗 ${listingUrl}`
+        : `Hello 👋\n\nI'm interested in your listing on *Aqari*:\n\n🏠 *${title}*\n\n🔗 ${listingUrl}`
     window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, "_blank")
   }
 

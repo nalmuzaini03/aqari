@@ -75,7 +75,13 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
   const badgeLabel = listing.listing_type === "rent" ? tr.forRentBadge : listing.listing_type === "short_stay" ? tr.shortStayBadge : tr.forSaleBadge
 
   const whatsappNumber = listing.phone_number.replace(/\D/g, "")
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${isAr ? `مرحباً، أنا مهتم بإعلانك: ${listing.title}` : `Hi, I'm interested in your listing: ${listing.title}`}`
+  const listingUrl = `https://getaqari.com/listings/${listing.id}`
+
+  const whatsappMessage = isAr
+    ? `السلام عليكم 👋\n\nأنا مهتم بإعلانك على *عقاري*:\n\n🏠 *${listing.title_ar || listing.title}*\n📍 ${AREA_AR[listing.area] ?? listing.area}\n💰 ${listing.listing_type === "short_stay" ? `${(listing.price_per_night ?? listing.price).toLocaleString()} د.ك / ليلة` : `${listing.price.toLocaleString()} د.ك${listing.listing_type === "rent" ? " / شهر" : ""}`}\n\n🔗 ${listingUrl}`
+    : `Hello 👋\n\nI'm interested in your listing on *Aqari*:\n\n🏠 *${listing.title_en || listing.title}*\n📍 ${listing.area}\n💰 ${listing.listing_type === "short_stay" ? `${(listing.price_per_night ?? listing.price).toLocaleString()} KWD / night` : `${listing.price.toLocaleString()} KWD${listing.listing_type === "rent" ? " / month" : ""}`}\n\n🔗 ${listingUrl}`
+
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
 
   return (
     <div style={{ background: "white", minHeight: "100vh" }}>
