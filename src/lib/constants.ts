@@ -1,28 +1,29 @@
 export const KUWAIT_AREAS = [
-  // Capital
-  "Abdulla Al-Salem", "Adailiya", "Bnaid Al-Qar", "Daiya", "Dasma", "Doha",
-  "Faiha", "Granada", "Jibla", "Kaifan", "Khaldiya", "Mansouriya", "Mirqab",
-  "Nahdha", "Nuzha", "Qadsiya", "Qortuba", "Rawda", "Shamiya", "Sharq",
-  "Shuwaikh", "Sulaibikhat", "Qairawan", "Surra", "Yarmouk",
-  // Hawalli
-  "Anjafa", "Bayan", "Bidaa", "Hawalli", "Hitteen", "Jabriya", "Mishrif",
-  "Mubarak Al-Abdullah", "Rumaithiya", "Salam", "Salmiya", "Salwa",
-  "Shaab", "Shuhada", "Siddiq", "Zahra",
-  // Farwaniya
-  "Abdullah Al-Mubarak", "Abraq Khaitan", "Andalus", "Ardiya", "Ashbeliah",
-  "Dajeej", "Farwaniya", "Jleeb Al-Shuyoukh", "Khaitan", "Omariya",
-  "Qurain", "Rai", "Rehab", "Riggae", "Sabah Al-Nasser",
-  // Ahmadi
-  "Abu Halifa", "Ahmadi", "Ali Sabah Al-Salem", "Bnaider", "Fahaheel",
-  "Fintas", "Funaitis", "Hadiya", "Khiran", "Mahboula", "Mangaf",
-  "Nuwaiseeb", "Riqqa", "Sabahiya", "Sabah Al-Ahmed Sea City",
-  "Shuaiba", "Wafra", "Zour",
-  // Jahra
-  "Amghara", "Jahra", "Mutlaa", "Naeem", "Naseem", "Oyoun",
-  "Qasr", "Saad Al-Abdullah", "Sulaibiya", "Taima",
-  // Mubarak Al-Kabeer
-  "Abu Al Hasaniya", "Abu Ftaira", "Adan", "Fnaitees", "Masayel",
-  "Messila", "Mubarak Al-Kabeer", "Qurain", "Qusour", "Sabah Al-Salem",
+  "Abdulla Al-Salem", "Abu Al Hasaniya", "Abu Ftaira", "Abu Halifa",
+  "Abraq Khaitan", "Adan", "Adailiya", "Ahmadi", "Ali Sabah Al-Salem",
+  "Amghara", "Andalus", "Anjafa", "Ardiya", "Ashbeliah",
+  "Bayan", "Bidaa", "Bnaider", "Bnaid Al-Qar",
+  "Daiya", "Dajeej", "Dasma", "Doha",
+  "Fahaheel", "Faiha", "Farwaniya", "Fintas", "Fnaitees", "Funaitis",
+  "Granada",
+  "Hadiya", "Hawalli", "Hitteen",
+  "Jabriya", "Jahra", "Jibla", "Jleeb Al-Shuyoukh",
+  "Kaifan", "Khaldiya", "Khaitan", "Khiran",
+  "Mahboula", "Mangaf", "Mansouriya", "Masayel", "Messila",
+  "Mirqab", "Mishrif", "Mubarak Al-Abdullah", "Mubarak Al-Kabeer",
+  "Mutlaa",
+  "Naeem", "Nahdha", "Naseem", "Nuwaiseeb", "Nuzha",
+  "Omariya", "Oyoun",
+  "Qadsiya", "Qairawan", "Qasr", "Qortuba", "Qurain", "Qusour",
+  "Rai", "Rawda", "Rehab", "Riggae", "Riqqa", "Rumaithiya",
+  "Saad Al-Abdullah", "Sabah Al-Ahmed Sea City", "Sabah Al-Nasser",
+  "Sabah Al-Salem", "Sabahiya", "Salam", "Salhiya", "Salmiya",
+  "Salwa", "Shaab", "Shamiya", "Sharq", "Shuhada", "Shuaiba",
+  "Shuwaikh", "Siddiq", "Sulaibikhat", "Sulaibiya", "Surra",
+  "Taima",
+  "Wafra",
+  "Yarmouk",
+  "Zahra", "Zour",
 ]
 
 export const PROPERTY_TYPES = [
