@@ -10,6 +10,11 @@ const ADMIN_EMAIL = "nalmuzaini03@gmail.com"
 type Listing = {
   id: string
   title: string
+  title_ar: string | null
+  title_en: string | null
+  description: string | null
+  description_ar: string | null
+  description_en: string | null
   price: number
   price_per_night: number | null
   area: string
@@ -31,6 +36,8 @@ export default function AdminPage() {
   const [search, setSearch] = useState("")
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [backfilling, setBackfilling] = useState(false)
+  const [backfillDone, setBackfillDone] = useState(0)
 
   useEffect(() => {
     supabaseBrowser.auth.getSession().then(async ({ data }) => {
@@ -52,6 +59,55 @@ export default function AdminPage() {
     await supabase.from("property_listings").update({ is_verified: !current }).eq("id", id)
     setListings(listings.map(l => l.id === id ? { ...l, is_verified: !current } : l))
     setTogglingId(null)
+  }
+
+  async function backfillTranslations() {
+    setBackfilling(true)
+    setBackfillDone(0)
+
+    const untranslated = listings.filter(l => !l.title_ar && !l.title_en)
+
+    for (const listing of untranslated) {
+      try {
+        const isArabic = /[\u0600-\u06FF]/.test(listing.title)
+        const targetLang = isArabic ? "en" : "ar"
+
+        const [titleRes, descRes] = await Promise.all([
+          fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: listing.title, targetLang }),
+          }),
+          listing.description ? fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: listing.description, targetLang }),
+          }) : Promise.resolve(null),
+        ])
+
+        const titleData = await titleRes.json()
+        const descData = descRes ? await descRes.json() : { translated: "" }
+
+        const update = isArabic ? {
+          title_ar: listing.title,
+          title_en: titleData.translated,
+          description_ar: listing.description,
+          description_en: descData.translated,
+        } : {
+          title_en: listing.title,
+          title_ar: titleData.translated,
+          description_en: listing.description,
+          description_ar: descData.translated,
+        }
+
+        await supabase.from("property_listings").update(update).eq("id", listing.id)
+        setBackfillDone(n => n + 1)
+      } catch {
+        continue
+      }
+    }
+
+    setBackfilling(false)
   }
 
   async function deleteListing(id: string) {
@@ -117,6 +173,30 @@ export default function AdminPage() {
                   <p style={{ fontSize: "13px", color: "#717171", marginTop: "4px" }}>{s.label}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Backfill translations */}
+            <div style={{ background: "white", border: "1px solid #EBEBEB", borderRadius: "16px", padding: "20px", marginBottom: "8px" }} className="flex items-center justify-between">
+              <div>
+                <p style={{ fontSize: "15px", fontWeight: 700, color: "#222" }}>Translate existing listings</p>
+                <p style={{ fontSize: "13px", color: "#717171", marginTop: "2px" }}>
+                  {backfilling
+                    ? `Translating... ${backfillDone} done`
+                    : `${listings.filter(l => !l.title_ar && !l.title_en).length} listings need translation`}
+                </p>
+              </div>
+              <button
+                onClick={backfillTranslations}
+                disabled={backfilling || listings.filter(l => !l.title_ar && !l.title_en).length === 0}
+                style={{
+                  background: backfilling ? "#DDDDDD" : "#FF385C",
+                  color: "white", border: "none", borderRadius: "8px",
+                  padding: "10px 20px", fontSize: "13px", fontWeight: 700,
+                  cursor: backfilling ? "not-allowed" : "pointer",
+                }}
+              >
+                {backfilling ? `${backfillDone} / ${listings.filter(l => !l.title_ar && !l.title_en).length}` : "Translate all →"}
+              </button>
             </div>
 
             {/* Search + filter */}
