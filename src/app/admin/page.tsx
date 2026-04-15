@@ -114,8 +114,11 @@ export default function AdminPage() {
     if (!confirm("Are you sure you want to delete this listing?")) return
     setDeletingId(id)
     const { error } = await supabaseBrowser.from("property_listings").delete().eq("id", id)
+    console.log("Delete result:", error)
     if (!error) {
       setListings(listings.filter(l => l.id !== id))
+    } else {
+      alert("Delete error: " + error.message)
     }
     setDeletingId(null)
   }
