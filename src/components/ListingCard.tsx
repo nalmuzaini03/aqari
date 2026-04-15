@@ -3,6 +3,34 @@ import Image from "next/image"
 import Link from "next/link"
 import { useLang } from "@/lib/language-context"
 
+const AREA_AR: Record<string, string> = {
+  "Salmiya": "السالمية", "Jabriya": "الجابرية", "Mishref": "مشرف",
+  "Hawalli": "حولي", "Rumaithiya": "الرميثية", "Bayan": "بيان",
+  "Farwaniya": "الفروانية", "Fahaheel": "الفحيحيل", "Sharq": "شرق",
+  "Mirqab": "المرقاب", "Kaifan": "كيفان", "Nuzha": "النزهة",
+  "Yarmouk": "اليرموك", "Shuwaikh": "الشويخ", "Doha": "الدوحة",
+  "Khaitan": "خيطان", "Fintas": "الفنطاس", "Mangaf": "المنقف",
+  "Mahboula": "المهبولة", "Abu Halifa": "أبو حليفة", "Ahmadi": "الأحمدي",
+  "Riqqa": "الرقة", "Sabahiya": "الصباحية", "Adan": "عدان",
+  "Sabah Al-Salem": "صباح السالم", "Fnaitees": "الفنيطيس", "Messila": "المسيلة",
+  "Jahra": "الجهراء", "Mutlaa": "المطلاع", "Mubarak Al-Kabeer": "مبارك الكبير",
+  "Qusour": "القصور", "Abu Ftaira": "أبو فطيرة", "Salwa": "سلوى",
+  "Shaab": "الشعب", "Rehab": "الرحاب", "Ardiya": "العارضية",
+  "Riggae": "الرقعي", "Qurain": "القرين", "Omariya": "العمرية",
+  "Ashbeliah": "إشبيلية", "Sabah Al-Nasser": "صباح الناصر",
+  "Abdullah Al-Mubarak": "عبدالله المبارك", "Wafra": "الوفرة",
+  "Khiran": "الخيران", "Nuwaiseeb": "النويصيب", "Shuaiba": "الشعيبة",
+  "Hadiya": "هدية", "Bnaider": "البنيدر", "Naeem": "النعيم",
+  "Qairawan": "القيروان", "Sulaibiya": "الصليبية", "Taima": "تيماء",
+  "Naseem": "النسيم", "Oyoun": "العيون", "Saad Al-Abdullah": "سعد العبدالله",
+  "Amghara": "أمغرة", "Dasman": "دسمان", "Bneid Al-Gar": "بنيد القار",
+  "Salhiya": "الصالحية", "Qadsiya": "القادسية", "Faiha": "الفيحاء",
+  "Shamiya": "الشامية", "Rawda": "الروضة", "Adailiya": "العدلية",
+  "Khaldiya": "الخالدية", "Mansouriya": "المنصورية", "Siddiq": "الصديق",
+  "Hittin": "حطين", "Bidaa": "البدع", "Andalus": "الأندلس",
+  "Mishrif": "مشرف",
+}
+
 export default function ListingCard({ listing: l }: { listing: Listing }) {
   const { lang } = useLang()
   const isAr = lang === "ar"
@@ -45,7 +73,7 @@ export default function ListingCard({ listing: l }: { listing: Listing }) {
           <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"/>
           </svg>
-          {l.area}
+          {isAr ? (AREA_AR[l.area] ?? l.area) : l.area}
         </p>
         <div style={{ fontSize: "12px", color: "#717171" }} className="flex items-center gap-1.5 mb-3">
           {l.bedrooms !== null && <>{l.bedrooms === 0 ? "Studio" : `${l.bedrooms} beds`}<span>·</span></>}

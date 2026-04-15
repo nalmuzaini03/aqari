@@ -12,9 +12,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing text or targetLang" }, { status: 400 })
   }
 
+  const KUWAIT_AREAS_NOTE = `Important: Do NOT translate Kuwait area/neighborhood names. Keep these exactly as written: Salmiya, Jabriya, Mishref, Hawalli, Rumaithiya, Bayan, Farwaniya, Fahaheel, Sharq, Mirqab, Kaifan, Nuzha, Yarmouk, Shuwaikh, Doha, Khaitan, Fintas, Mangaf, Mahboula, Abu Halifa, Ahmadi, Riqqa, Sabahiya, Adan, Sabah Al-Salem, Fnaitees, Messila, Jahra, Mutlaa, Mubarak Al-Kabeer, and all other Kuwait area names.`
+
   const prompt = targetLang === "ar"
-    ? `Translate the following Kuwait real estate listing text to Arabic. Keep it natural and professional. Only return the translated text, nothing else:\n\n${text}`
-    : `Translate the following Kuwait real estate listing text to English. Keep it natural and professional. Only return the translated text, nothing else:\n\n${text}`
+    ? `Translate the following Kuwait real estate listing text to Arabic. Keep it natural and professional. ${KUWAIT_AREAS_NOTE} Only return the translated text, nothing else:\n\n${text}`
+    : `Translate the following Kuwait real estate listing text to English. Keep it natural and professional. ${KUWAIT_AREAS_NOTE} Only return the translated text, nothing else:\n\n${text}`
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5",
