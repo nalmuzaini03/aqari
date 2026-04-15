@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/language-context"
 import { t } from "@/lib/translations"
 import { createClient } from "@/lib/supabase-browser"
+import { KUWAIT_AREAS } from "@/lib/constants"
 
 const GOVERNORATES = [
   { en: "All", ar: "الكل" },
@@ -177,7 +178,7 @@ export default function HomePage() {
         {/* Search bar */}
         <div style={{ background: "white", borderRadius: "16px", border: "1px solid #DDDDDD", display: "flex", overflow: "hidden", maxWidth: "900px", margin: "0 auto 48px", boxShadow: "0 2px 16px rgba(0,0,0,0.08)", flexWrap: "wrap" }}>
           {[
-            { label: tr.area, value: areaFilter, options: [tr.anywhere, ...AREAS_BY_GOV["All"].map(a => isAr ? a.ar : a.en)], onChange: setAreaFilter },
+            { label: tr.area, value: areaFilter, options: [tr.anywhere, ...KUWAIT_AREAS], onChange: setAreaFilter },
             { label: tr.type, value: typeFilter, options: [tr.forRentOrSale, tr.forRent, tr.forSale, tr.shortStay], onChange: setTypeFilter },
             { label: tr.property, value: propertyFilter, options: [tr.anyType, tr.apartment, tr.villa, tr.floor, tr.chalet, tr.office, tr.shop], onChange: setPropertyFilter },
           ].map((f) => (
