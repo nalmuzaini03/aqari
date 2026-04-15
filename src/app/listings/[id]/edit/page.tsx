@@ -81,7 +81,7 @@ export default function EditListingPage() {
     const pricePerNight = listingType === "short_stay" ? Number(form.price_per_night) : null
     const price = listingType === "short_stay" ? (pricePerNight ?? 0) : Number(form.price)
 
-    const { error } = await supabaseBrowser.from("property_listings").update({
+    const { error, data } = await supabaseBrowser.from("property_listings").update({
       title: form.title,
       description: form.description,
       price,
@@ -92,7 +92,9 @@ export default function EditListingPage() {
       bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
       phone_number: form.phone_number,
       listing_type: listingType,
-    }).eq("id", id)
+    }).eq("id", id).select()
+
+    console.log("Update result:", { error, data })
 
     if (error) { setError(error.message); setLoading(false); return }
     router.push("/my-listings")
