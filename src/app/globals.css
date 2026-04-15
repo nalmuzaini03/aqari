@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

@@ -164,27 +164,27 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-3 gap-2 mb-6">
             {listing.bedrooms !== null && (
-              <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB" }} className="p-3 text-center">
-                <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }}>{listing.bedrooms === 0 ? tr.studio : listing.bedrooms}</p>
-                <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px" }} className="mt-0.5">{tr.bedroomsLabel}</p>
+              <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB", padding: "12px 8px", textAlign: "center" }}>
+                <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.bedrooms === 0 ? tr.studio : listing.bedrooms}</p>
+                <p style={{ fontSize: "10px", color: "#717171", letterSpacing: "0.3px", marginTop: "2px" }}>{tr.bedroomsLabel}</p>
               </div>
             )}
             {listing.bathrooms !== null && (
-              <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB" }} className="p-3 text-center">
-                <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }}>{listing.bathrooms}</p>
-                <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px" }} className="mt-0.5">{tr.bathroomsLabel}</p>
+              <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB", padding: "12px 8px", textAlign: "center" }}>
+                <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.bathrooms}</p>
+                <p style={{ fontSize: "10px", color: "#717171", letterSpacing: "0.3px", marginTop: "2px" }}>{tr.bathroomsLabel}</p>
               </div>
             )}
-            <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB" }} className="p-3 text-center">
-              <p style={{ fontSize: "20px", fontWeight: 700, color: "#222" }} className="capitalize">
+            <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB", padding: "12px 8px", textAlign: "center" }}>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "#222", wordBreak: "break-word" as const }}>
                 {isAr ? ({
                   apartment: "شقة", villa: "فيلا", floor: "طابق", building: "عمارة",
                   chalet: "شاليه", office: "مكتب", shop: "محل", land: "أرض"
-                }[listing.property_type] ?? listing.property_type) : listing.property_type}
+                }[listing.property_type] ?? listing.property_type) : listing.property_type.charAt(0).toUpperCase() + listing.property_type.slice(1)}
               </p>
-              <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px" }} className="mt-0.5">{tr.typeLabel}</p>
+              <p style={{ fontSize: "10px", color: "#717171", letterSpacing: "0.3px", marginTop: "2px" }}>{tr.typeLabel}</p>
             </div>
           </div>
 
