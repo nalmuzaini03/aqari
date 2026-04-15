@@ -54,19 +54,21 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
           <ListingsMap listings={listings ?? []} />
         </div>
       ) : (
-        <div className="hidden lg:flex flex-1 overflow-hidden">
-          <div className="w-1/2 overflow-y-auto">
+        <>
+          {/* Desktop: split grid + map */}
+          <div className="hidden lg:flex flex-1 overflow-hidden">
+            <div className="w-1/2 overflow-y-auto">
+              <ListingsGrid listings={listings ?? []} />
+            </div>
+            <div className="w-1/2" style={{ position: "sticky", top: 0, height: "calc(100dvh - 60px)" }}>
+              <ListingsMap listings={listings ?? []} />
+            </div>
+          </div>
+          {/* Mobile: grid only */}
+          <div className="lg:hidden flex-1 overflow-y-auto">
             <ListingsGrid listings={listings ?? []} />
           </div>
-          <div className="w-1/2" style={{ position: "sticky", top: 0, height: "calc(100dvh - 60px)" }}>
-            <ListingsMap listings={listings ?? []} />
-          </div>
-        </div>
-      )}
-      {!showMap && (
-        <div className="lg:hidden flex-1 overflow-y-auto">
-          <ListingsGrid listings={listings ?? []} />
-        </div>
+        </>
       )}
     </main>
   )
