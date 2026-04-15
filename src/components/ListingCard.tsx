@@ -4,31 +4,43 @@ import Link from "next/link"
 import { useLang } from "@/lib/language-context"
 
 const AREA_AR: Record<string, string> = {
-  "Salmiya": "السالمية", "Jabriya": "الجابرية", "Mishref": "مشرف",
-  "Hawalli": "حولي", "Rumaithiya": "الرميثية", "Bayan": "بيان",
-  "Farwaniya": "الفروانية", "Fahaheel": "الفحيحيل", "Sharq": "شرق",
-  "Mirqab": "المرقاب", "Kaifan": "كيفان", "Nuzha": "النزهة",
-  "Yarmouk": "اليرموك", "Shuwaikh": "الشويخ", "Doha": "الدوحة",
-  "Khaitan": "خيطان", "Fintas": "الفنطاس", "Mangaf": "المنقف",
-  "Mahboula": "المهبولة", "Abu Halifa": "أبو حليفة", "Ahmadi": "الأحمدي",
-  "Riqqa": "الرقة", "Sabahiya": "الصباحية", "Adan": "عدان",
-  "Sabah Al-Salem": "صباح السالم", "Fnaitees": "الفنيطيس", "Messila": "المسيلة",
-  "Jahra": "الجهراء", "Mutlaa": "المطلاع", "Mubarak Al-Kabeer": "مبارك الكبير",
-  "Qusour": "القصور", "Abu Ftaira": "أبو فطيرة", "Salwa": "سلوى",
-  "Shaab": "الشعب", "Rehab": "الرحاب", "Ardiya": "العارضية",
-  "Riggae": "الرقعي", "Qurain": "القرين", "Omariya": "العمرية",
-  "Ashbeliah": "إشبيلية", "Sabah Al-Nasser": "صباح الناصر",
-  "Abdullah Al-Mubarak": "عبدالله المبارك", "Wafra": "الوفرة",
-  "Khiran": "الخيران", "Nuwaiseeb": "النويصيب", "Shuaiba": "الشعيبة",
-  "Hadiya": "هدية", "Bnaider": "البنيدر", "Naeem": "النعيم",
-  "Qairawan": "القيروان", "Sulaibiya": "الصليبية", "Taima": "تيماء",
-  "Naseem": "النسيم", "Oyoun": "العيون", "Saad Al-Abdullah": "سعد العبدالله",
-  "Amghara": "أمغرة", "Dasman": "دسمان", "Bneid Al-Gar": "بنيد القار",
-  "Salhiya": "الصالحية", "Qadsiya": "القادسية", "Faiha": "الفيحاء",
-  "Shamiya": "الشامية", "Rawda": "الروضة", "Adailiya": "العدلية",
-  "Khaldiya": "الخالدية", "Mansouriya": "المنصورية", "Siddiq": "الصديق",
-  "Hittin": "حطين", "Bidaa": "البدع", "Andalus": "الأندلس",
-  "Mishrif": "مشرف",
+  // Capital
+  "Abdulla Al-Salem": "عبدالله السالم", "Adailiya": "العدلية", "Bnaid Al-Qar": "بنيد القار",
+  "Daiya": "الدعية", "Dasma": "الدسمة", "Doha": "الدوحة",
+  "Faiha": "الفيحاء", "Granada": "غرناطة", "Jibla": "جبلة",
+  "Kaifan": "كيفان", "Khaldiya": "الخالدية", "Mansouriya": "المنصورية",
+  "Mirqab": "المرقاب", "Nahdha": "النهضة", "Nuzha": "النزهة",
+  "Qadsiya": "القادسية", "Qortuba": "قرطبة", "Rawda": "الروضة",
+  "Shamiya": "الشامية", "Sharq": "شرق", "Shuwaikh": "الشويخ",
+  "Sulaibikhat": "الصليبخات", "Qairawan": "القيروان", "Surra": "السرة",
+  "Yarmouk": "اليرموك",
+  // Hawalli
+  "Anjafa": "العنجفة", "Bayan": "بيان", "Bidaa": "البدع",
+  "Hawalli": "حولي", "Hitteen": "حطين", "Jabriya": "الجابرية",
+  "Mishrif": "مشرف", "Mubarak Al-Abdullah": "مبارك العبدالله", "Rumaithiya": "الرميثية",
+  "Salam": "السلام", "Salmiya": "السالمية", "Salwa": "سلوى",
+  "Shaab": "الشعب", "Shuhada": "الشهداء", "Siddiq": "الصديق", "Zahra": "الزهراء",
+  // Farwaniya
+  "Abdullah Al-Mubarak": "عبدالله المبارك", "Abraq Khaitan": "أبرق خيطان",
+  "Andalus": "الأندلس", "Ardiya": "العارضية", "Ashbeliah": "إشبيلية",
+  "Dajeej": "الدجيج", "Farwaniya": "الفروانية", "Jleeb Al-Shuyoukh": "جليب الشيوخ",
+  "Khaitan": "خيطان", "Omariya": "العمرية", "Qurain": "القرين",
+  "Rai": "الري", "Rehab": "الرحاب", "Riggae": "الرقعي", "Sabah Al-Nasser": "صباح الناصر",
+  // Ahmadi
+  "Abu Halifa": "أبو حليفة", "Ahmadi": "الأحمدي", "Ali Sabah Al-Salem": "علي صباح السالم",
+  "Bnaider": "البنيدر", "Fahaheel": "الفحيحيل", "Fintas": "الفنطاس",
+  "Funaitis": "الفنيطيس", "Hadiya": "هدية", "Khiran": "الخيران",
+  "Mahboula": "المهبولة", "Mangaf": "المنقف", "Nuwaiseeb": "النويصيب",
+  "Riqqa": "الرقة", "Sabahiya": "الصباحية", "Sabah Al-Ahmed Sea City": "مدينة صباح الأحمد البحرية",
+  "Shuaiba": "الشعيبة", "Wafra": "الوفرة", "Zour": "الزور",
+  // Jahra
+  "Amghara": "أمغرة", "Jahra": "الجهراء", "Mutlaa": "المطلاع",
+  "Naeem": "النعيم", "Naseem": "النسيم", "Oyoun": "العيون",
+  "Qasr": "القصر", "Saad Al-Abdullah": "سعد العبدالله", "Sulaibiya": "الصليبية", "Taima": "تيماء",
+  // Mubarak Al-Kabeer
+  "Abu Al Hasaniya": "أبو الحصانية", "Abu Ftaira": "أبو فطيرة", "Adan": "عدان",
+  "Fnaitees": "الفنيطيس", "Masayel": "المسايل", "Messila": "المسيلة",
+  "Mubarak Al-Kabeer": "مبارك الكبير", "Qusour": "القصور", "Sabah Al-Salem": "صباح السالم",
 }
 
 export default function ListingCard({ listing: l }: { listing: Listing }) {

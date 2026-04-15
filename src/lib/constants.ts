@@ -1,24 +1,28 @@
 export const KUWAIT_AREAS = [
   // Capital
-  "Sharq", "Mirqab", "Salhiya", "Dasman", "Bneid Al-Gar", "Kaifan", "Nuzha", "Yarmouk",
-  "Shuwaikh", "Doha", "Qadsiya", "Faiha", "Shamiya", "Sulaibikhat", "Rawda", "Adailiya",
-  "Khaldiya", "Mansouriya",
+  "Abdulla Al-Salem", "Adailiya", "Bnaid Al-Qar", "Daiya", "Dasma", "Doha",
+  "Faiha", "Granada", "Jibla", "Kaifan", "Khaldiya", "Mansouriya", "Mirqab",
+  "Nahdha", "Nuzha", "Qadsiya", "Qortuba", "Rawda", "Shamiya", "Sharq",
+  "Shuwaikh", "Sulaibikhat", "Qairawan", "Surra", "Yarmouk",
   // Hawalli
-  "Salmiya", "Jabriya", "Mishref", "Hawalli", "Rumaithiya", "Bayan", "Salwa", "Shaab",
-  "Siddiq", "Midan Hawalli", "Hittin", "Shuhada", "Bidaa", "Zuhor",
+  "Anjafa", "Bayan", "Bidaa", "Hawalli", "Hitteen", "Jabriya", "Mishrif",
+  "Mubarak Al-Abdullah", "Rumaithiya", "Salam", "Salmiya", "Salwa",
+  "Shaab", "Shuhada", "Siddiq", "Zahra",
   // Farwaniya
-  "Farwaniya", "Khaitan", "Rehab", "Ardiya", "Riggae", "Qurain", "Omariya", "Ashbeliah",
-  "Sabah Al-Nasser", "Abdullah Al-Mubarak", "Andalus", "Abraq Khaitan", "Dajeej",
+  "Abdullah Al-Mubarak", "Abraq Khaitan", "Andalus", "Ardiya", "Ashbeliah",
+  "Dajeej", "Farwaniya", "Jleeb Al-Shuyoukh", "Khaitan", "Omariya",
+  "Qurain", "Rai", "Rehab", "Riggae", "Sabah Al-Nasser",
   // Ahmadi
-  "Fahaheel", "Fintas", "Mangaf", "Mahboula", "Abu Halifa", "Ahmadi", "Riqqa", "Sabahiya",
-  "Funaitis", "Ali Sabah Al-Salem", "Zour", "Wafra", "Khiran", "Nuwaiseeb", "Shuaiba",
-  "Hadiya", "Bnaider",
+  "Abu Halifa", "Ahmadi", "Ali Sabah Al-Salem", "Bnaider", "Fahaheel",
+  "Fintas", "Funaitis", "Hadiya", "Khiran", "Mahboula", "Mangaf",
+  "Nuwaiseeb", "Riqqa", "Sabahiya", "Sabah Al-Ahmed Sea City",
+  "Shuaiba", "Wafra", "Zour",
   // Jahra
-  "Jahra", "Qasr", "Taima", "Naseem", "Oyoun", "Saad Al-Abdullah", "Amghara", "Mutlaa",
-  "Sulaibiya", "Naeem", "Qairawan",
+  "Amghara", "Jahra", "Mutlaa", "Naeem", "Naseem", "Oyoun",
+  "Qasr", "Saad Al-Abdullah", "Sulaibiya", "Taima",
   // Mubarak Al-Kabeer
-  "Mubarak Al-Kabeer", "Adan", "Sabah Al-Salem", "Fnaitees", "Messila", "Abu Ftaira",
-  "Qusour", "Mishrif",
+  "Abu Al Hasaniya", "Abu Ftaira", "Adan", "Fnaitees", "Masayel",
+  "Messila", "Mubarak Al-Kabeer", "Qurain", "Qusour", "Sabah Al-Salem",
 ]
 
 export const PROPERTY_TYPES = [
