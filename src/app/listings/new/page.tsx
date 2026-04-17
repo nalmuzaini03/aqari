@@ -61,6 +61,7 @@ export default function NewListingPage() {
   const [floorNumber, setFloorNumber] = useState("")
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [geocoding, setGeocoding] = useState(false)
+  const [selectedArea, setSelectedArea] = useState("")
 
   const LISTING_TYPES = [
     { value: "rent", label: isAr ? "للإيجار" : "For rent", desc: isAr ? "إيجار شهري" : "Monthly rental" },
@@ -306,7 +307,14 @@ export default function NewListingPage() {
             {/* Area */}
             <div>
               <label style={labelStyle}>{tr.areaLabel}</label>
-              <select name="area" required style={inputStyle} className="focus:outline-none">
+              <select
+                name="area"
+                required
+                value={selectedArea}
+                onChange={e => setSelectedArea(e.target.value)}
+                style={inputStyle}
+                className="focus:outline-none"
+              >
                 <option value="">{tr.selectArea}</option>
                 {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
@@ -358,11 +366,8 @@ export default function NewListingPage() {
             {/* Locate button */}
             <button
               type="button"
-              onClick={() => {
-                const areaSelect = document.querySelector('select[name="area"]') as HTMLSelectElement
-                geocodeAddress(areaSelect?.value || "")
-              }}
-              disabled={geocoding}
+              onClick={() => geocodeAddress(selectedArea)}
+              disabled={geocoding || !selectedArea}
               style={{ background: geocoding ? "#DDDDDD" : "white", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
               className="w-full"
             >
