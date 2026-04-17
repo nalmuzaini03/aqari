@@ -16,12 +16,13 @@ type Props = {
   currentPropertyType: string
   currentBedrooms: string
   currentMaxPrice: string
+  currentMinPrice: string
   showMap: boolean
 }
 
 export default function FiltersBar({
   areas, propertyTypes, selectedAreas,
-  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, showMap,
+  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, currentMinPrice, showMap,
 }: Props) {
   const router = useRouter()
   const pathname = usePathname()
@@ -154,6 +155,7 @@ export default function FiltersBar({
           currentPropertyType={currentPropertyType}
           currentBedrooms={currentBedrooms}
           currentMaxPrice={currentMaxPrice}
+          currentMinPrice={currentMinPrice}
           onClose={() => setModalOpen(false)}
         />
       )}

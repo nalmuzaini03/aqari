@@ -195,6 +195,7 @@ export default function NewListingPage() {
       property_type: data.get("property_type"),
       phone_number: data.get("phone_number"),
       listing_type: listingType,
+      size_sqm: data.get("size_sqm") ? Number(data.get("size_sqm")) : null,
       amenities: selectedAmenities,
       photos: photoUrls,
       is_verified: false,
@@ -395,6 +396,19 @@ export default function NewListingPage() {
                   <option value="4">{isAr ? "+4" : "4+"}</option>
                 </select>
               </div>
+            </div>
+
+            {/* Size */}
+            <div>
+              <label style={labelStyle}>{isAr ? "المساحة (م²)" : "SIZE (SQM)"}</label>
+              <input
+                name="size_sqm"
+                type="number"
+                min={0}
+                placeholder={isAr ? "مثال: 120" : "e.g. 120"}
+                style={inputStyle}
+                className="focus:outline-none"
+              />
             </div>
 
             {/* Max guests for short stay */}

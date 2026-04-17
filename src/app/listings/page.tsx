@@ -10,7 +10,7 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
 export default async function ListingsPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams
-  const { listing_type, area, property_type, bedrooms, max_price, view } = params
+  const { listing_type, area, property_type, bedrooms, max_price, min_price, view } = params
 
   let query = supabase
     .from("property_listings")
@@ -27,6 +27,8 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
     query = query.eq("property_type", property_type)
   if (bedrooms && typeof bedrooms === "string")
     query = query.eq("bedrooms", Number(bedrooms))
+  if (min_price && typeof min_price === "string")
+    query = query.gte("price", Number(min_price))
   if (max_price && typeof max_price === "string")
     query = query.lte("price", Number(max_price))
 
@@ -45,6 +47,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
         currentPropertyType={typeof property_type === "string" ? property_type : ""}
         currentBedrooms={typeof bedrooms === "string" ? bedrooms : ""}
         currentMaxPrice={typeof max_price === "string" ? max_price : ""}
+        currentMinPrice={typeof min_price === "string" ? min_price : ""}
         showMap={showMap}
       />
       {error ? (

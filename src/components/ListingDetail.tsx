@@ -24,6 +24,7 @@ type Listing = {
   description_en: string | null
   photos: string[]
   amenities: string[]
+  size_sqm: number | null
   phone_number: string
 }
 
@@ -212,6 +213,12 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
               </p>
               <p style={{ fontSize: "10px", color: "#717171", letterSpacing: "0.3px", marginTop: "2px" }}>{tr.typeLabel}</p>
             </div>
+            {listing.size_sqm && (
+              <div style={{ background: "#F7F7F7", borderRadius: "12px", border: "1px solid #EBEBEB", padding: "12px 8px", textAlign: "center" }}>
+                <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>{listing.size_sqm}</p>
+                <p style={{ fontSize: "10px", color: "#717171", letterSpacing: "0.3px", marginTop: "2px" }}>{isAr ? "م²" : "SQM"}</p>
+              </div>
+            )}
           </div>
 
           {/* Description */}

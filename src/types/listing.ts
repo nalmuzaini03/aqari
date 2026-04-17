@@ -20,6 +20,7 @@ export type Listing = {
   phone_number: string
   photos: string[]
   amenities: string[]
+  size_sqm: number | null
   is_verified: boolean
   created_at: string
   listing_type: "rent" | "sale" | "short_stay"

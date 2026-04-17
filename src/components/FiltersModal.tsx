@@ -12,6 +12,7 @@ type Props = {
   currentPropertyType: string
   currentBedrooms: string
   currentMaxPrice: string
+  currentMinPrice: string
   onClose: () => void
 }
 
@@ -39,7 +40,7 @@ const PROPERTY_LABELS: Record<string, { en: string; ar: string }> = {
 
 export default function FiltersModal({
   areas, propertyTypes, selectedAreas,
-  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, onClose,
+  currentListingType, currentPropertyType, currentBedrooms, currentMaxPrice, currentMinPrice, onClose,
 }: Props) {
   const router = useRouter()
   const pathname = usePathname()
@@ -52,19 +53,23 @@ export default function FiltersModal({
   const [localAreas, setLocalAreas] = useState<string[]>(selectedAreas)
   const [bedrooms, setBedrooms] = useState(currentBedrooms ? Number(currentBedrooms) : -1)
   const [maxPrice, setMaxPrice] = useState(currentMaxPrice ? Number(currentMaxPrice) : -1)
+  const [minPrice, setMinPrice] = useState(currentMinPrice ? Number(currentMinPrice) : -1)
 
   const isForSale = listingType === "sale"
   const priceMin = isForSale ? 10000 : 50
   const priceMax = isForSale ? 2000000 : 10000
   const priceStep = isForSale ? 10000 : 50
-  const sliderValue = maxPrice === -1 ? priceMax : Math.min(maxPrice, priceMax)
+
+  const minSlider = minPrice === -1 ? priceMin : Math.min(minPrice, priceMax)
+  const maxSlider = maxPrice === -1 ? priceMax : Math.min(maxPrice, priceMax)
 
   function toggleArea(area: string) {
     setLocalAreas(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area])
   }
 
   function clearAll() {
-    setListingType(""); setPropertyType(""); setLocalAreas([]); setBedrooms(-1); setMaxPrice(-1)
+    setListingType(""); setPropertyType(""); setLocalAreas([])
+    setBedrooms(-1); setMaxPrice(-1); setMinPrice(-1)
   }
 
   function apply() {
@@ -72,6 +77,7 @@ export default function FiltersModal({
     if (listingType) params.set("listing_type", listingType)
     if (propertyType) params.set("property_type", propertyType)
     if (bedrooms >= 0) params.set("bedrooms", String(bedrooms))
+    if (minPrice !== -1 && minPrice > priceMin) params.set("min_price", String(minPrice))
     if (maxPrice !== -1 && maxPrice < priceMax) params.set("max_price", String(maxPrice))
     localAreas.forEach(a => params.append("area", a))
     router.push(`${pathname}?${params.toString()}`)
@@ -113,7 +119,7 @@ export default function FiltersModal({
             <p style={sectionLabel}>{tr.listingType}</p>
             <div style={{ display: "flex", gap: "8px" }}>
               {listingTypes.map(lt => (
-                <button key={lt.val} onClick={() => { setListingType(lt.val); setMaxPrice(-1) }}
+                <button key={lt.val} onClick={() => { setListingType(lt.val); setMaxPrice(-1); setMinPrice(-1) }}
                   style={{ flex: 1, padding: "10px", borderRadius: "8px", border: listingType === lt.val ? "2px solid #222" : "1px solid #DDDDDD", background: "white", color: "#222", fontSize: "13px", cursor: "pointer", fontWeight: listingType === lt.val ? 700 : 400 }}>
                   {lt.label}
                 </button>
@@ -157,16 +163,38 @@ export default function FiltersModal({
             </div>
           </div>
 
-          {/* Price */}
+          {/* Price Range */}
           <div style={{ marginBottom: "28px", paddingBottom: "28px", borderBottom: "1px solid #EBEBEB" }}>
-            <p style={sectionLabel}>{tr.maxPrice}</p>
-            <p style={{ fontSize: "22px", fontWeight: 700, color: "#222", marginBottom: "16px" }}>
-              {maxPrice === -1 ? tr.anyPrice : formatPrice(sliderValue)}
-            </p>
-            <input type="range" min={priceMin} max={priceMax} step={priceStep} value={sliderValue}
-              onChange={e => setMaxPrice(Number(e.target.value))}
+            <p style={sectionLabel}>{isAr ? "نطاق السعر" : "PRICE RANGE"}</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <p style={{ fontSize: "18px", fontWeight: 700, color: "#222" }}>
+                {minPrice === -1 && maxPrice === -1
+                  ? (isAr ? "أي سعر" : "Any price")
+                  : `${formatPrice(minSlider)} — ${formatPrice(maxSlider)}`}
+              </p>
+            </div>
+
+            {/* Min price slider */}
+            <p style={{ fontSize: "12px", color: "#717171", marginBottom: "6px" }}>{isAr ? "الحد الأدنى" : "Min price"}</p>
+            <input type="range" min={priceMin} max={priceMax} step={priceStep} value={minSlider}
+              onChange={e => {
+                const val = Number(e.target.value)
+                setMinPrice(val)
+                if (maxPrice !== -1 && val > maxSlider) setMaxPrice(val)
+              }}
+              style={{ width: "100%", accentColor: "#FF385C", marginBottom: "16px" }} />
+
+            {/* Max price slider */}
+            <p style={{ fontSize: "12px", color: "#717171", marginBottom: "6px" }}>{isAr ? "الحد الأقصى" : "Max price"}</p>
+            <input type="range" min={priceMin} max={priceMax} step={priceStep} value={maxSlider}
+              onChange={e => {
+                const val = Number(e.target.value)
+                setMaxPrice(val)
+                if (minPrice !== -1 && val < minSlider) setMinPrice(val)
+              }}
               style={{ width: "100%", accentColor: "#FF385C" }} />
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
               <span style={{ fontSize: "11px", color: "#717171" }}>{isAr ? `${priceMin.toLocaleString()} د.ك` : `${priceMin.toLocaleString()} KWD`}</span>
               <span style={{ fontSize: "11px", color: "#717171" }}>{isForSale ? (isAr ? "+٢،٠٠٠،٠٠٠ د.ك" : "2,000,000+ KWD") : (isAr ? "+١٠،٠٠٠ د.ك" : "10,000+ KWD")}</span>
             </div>
