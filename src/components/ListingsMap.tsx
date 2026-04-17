@@ -17,7 +17,9 @@ export default function ListingsMap({ listings }: Props) {
   const tr = t[lang]
   const isAr = lang === "ar"
 
-  const listingsWithCoords = listings.filter(l => AREA_COORDINATES[l.area])
+  const listingsWithCoords = listings.filter(l =>
+    (l.latitude && l.longitude) || AREA_COORDINATES[l.area]
+  )
 
   const badgeBg = (type: string) =>
     type === "rent" ? "#FF385C" : type === "short_stay" ? "#7C3AED" : "#222"
@@ -46,10 +48,13 @@ export default function ListingsMap({ listings }: Props) {
       >
         {listingsWithCoords.map(listing => {
           const coords = AREA_COORDINATES[listing.area]
-          const offset = {
-            lat: coords.lat + (Math.random() - 0.5) * 0.008,
-            lng: coords.lng + (Math.random() - 0.5) * 0.008,
-          }
+          if (!coords && !listing.latitude) return null
+          const offset = listing.latitude && listing.longitude
+            ? { lat: listing.latitude, lng: listing.longitude }
+            : {
+                lat: coords.lat + (Math.random() - 0.5) * 0.008,
+                lng: coords.lng + (Math.random() - 0.5) * 0.008,
+              }
           const isSelected = selectedListing?.id === listing.id
 
           return (

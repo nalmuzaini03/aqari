@@ -56,6 +56,11 @@ export default function NewListingPage() {
   const [photos, setPhotos] = useState<File[]>([])
   const [listingType, setListingType] = useState("rent")
   const [authed, setAuthed] = useState(false)
+  const [blockNumber, setBlockNumber] = useState("")
+  const [streetNumber, setStreetNumber] = useState("")
+  const [floorNumber, setFloorNumber] = useState("")
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [geocoding, setGeocoding] = useState(false)
 
   const LISTING_TYPES = [
     { value: "rent", label: isAr ? "للإيجار" : "For rent", desc: isAr ? "إيجار شهري" : "Monthly rental" },
@@ -69,6 +74,21 @@ export default function NewListingPage() {
       else setAuthed(true)
     })
   }, [])
+
+  async function geocodeAddress(area: string) {
+    if (!area) return
+    setGeocoding(true)
+    try {
+      const res = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ area, block: blockNumber, street: streetNumber }),
+      })
+      const data = await res.json()
+      if (data.lat) setCoords({ lat: data.lat, lng: data.lng })
+    } catch {}
+    setGeocoding(false)
+  }
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -156,6 +176,11 @@ export default function NewListingPage() {
       price,
       price_per_night: pricePerNight,
       area: data.get("area"),
+      block_number: blockNumber || null,
+      street_number: streetNumber || null,
+      floor_number: floorNumber || null,
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
       bedrooms: data.get("bedrooms") ? Number(data.get("bedrooms")) : null,
       bathrooms: data.get("bathrooms") ? Number(data.get("bathrooms")) : null,
       property_type: data.get("property_type"),
@@ -286,6 +311,66 @@ export default function NewListingPage() {
                 {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
             </div>
+
+            {/* Block + Street + Floor */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label style={labelStyle}>{isAr ? "رقم القطعة" : "BLOCK"}</label>
+                <input
+                  value={blockNumber}
+                  onChange={e => setBlockNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 5" : "e.g. 5"}
+                  style={inputStyle} className="focus:outline-none"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>{isAr ? "رقم الشارع" : "STREET"}</label>
+                <input
+                  value={streetNumber}
+                  onChange={e => setStreetNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 12" : "e.g. 12"}
+                  style={inputStyle} className="focus:outline-none"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>{isAr ? "الطابق" : "FLOOR"}</label>
+                <input
+                  value={floorNumber}
+                  onChange={e => setFloorNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 3" : "e.g. 3"}
+                  style={inputStyle} className="focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Map preview */}
+            {coords && (
+              <div style={{ border: "1px solid #EBEBEB", borderRadius: "12px", overflow: "hidden", height: "200px" }}>
+                <iframe
+                  width="100%"
+                  height="200"
+                  style={{ border: 0 }}
+                  src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
+                />
+              </div>
+            )}
+
+            {/* Locate button */}
+            <button
+              type="button"
+              onClick={() => {
+                const areaSelect = document.querySelector('select[name="area"]') as HTMLSelectElement
+                geocodeAddress(areaSelect?.value || "")
+              }}
+              disabled={geocoding}
+              style={{ background: geocoding ? "#DDDDDD" : "white", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+              className="w-full"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"/>
+              </svg>
+              {geocoding ? (isAr ? "جاري تحديد الموقع..." : "Locating...") : (isAr ? "تحديد الموقع على الخريطة" : "Preview location on map")}
+            </button>
 
             {/* Property type */}
             <div>

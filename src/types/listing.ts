@@ -9,6 +9,11 @@ export type Listing = {
   price: number
   price_per_night: number | null
   area: string
+  block_number: string | null
+  street_number: string | null
+  floor_number: string | null
+  latitude: number | null
+  longitude: number | null
   bedrooms: number | null
   bathrooms: number | null
   property_type: string
