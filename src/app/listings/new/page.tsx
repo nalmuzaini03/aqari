@@ -76,21 +76,6 @@ export default function NewListingPage() {
     })
   }, [])
 
-  async function geocodeAddress(area: string) {
-    if (!area) return
-    setGeocoding(true)
-    try {
-      const res = await fetch("/api/geocode", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ area, block: blockNumber, street: streetNumber }),
-      })
-      const data = await res.json()
-      if (data.lat) setCoords({ lat: data.lat, lng: data.lng })
-    } catch {}
-    setGeocoding(false)
-  }
-
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     const compressed = await Promise.all(files.map(compressImage))
@@ -118,6 +103,20 @@ export default function NewListingPage() {
     const listingId = crypto.randomUUID()
     const photoUrls = await uploadPhotos(listingId)
     const { data: { session } } = await supabaseBrowser.auth.getSession()
+
+    // Auto-geocode on submit
+    let finalCoords = coords
+    if (!finalCoords && selectedArea) {
+      try {
+        const res = await fetch("/api/geocode", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ area: selectedArea, block: blockNumber, street: streetNumber }),
+        })
+        const geoData = await res.json()
+        if (geoData.lat) finalCoords = { lat: geoData.lat, lng: geoData.lng }
+      } catch {}
+    }
 
     const title = data.get("title") as string
     const description = data.get("description") as string
@@ -180,8 +179,8 @@ export default function NewListingPage() {
       block_number: blockNumber || null,
       street_number: streetNumber || null,
       floor_number: floorNumber || null,
-      latitude: coords?.lat ?? null,
-      longitude: coords?.lng ?? null,
+      latitude: finalCoords?.lat ?? null,
+      longitude: finalCoords?.lng ?? null,
       bedrooms: data.get("bedrooms") ? Number(data.get("bedrooms")) : null,
       bathrooms: data.get("bathrooms") ? Number(data.get("bathrooms")) : null,
       property_type: data.get("property_type"),
@@ -366,7 +365,20 @@ export default function NewListingPage() {
             {/* Locate button */}
             <button
               type="button"
-              onClick={() => geocodeAddress(selectedArea)}
+              onClick={async () => {
+                if (!selectedArea) return
+                setGeocoding(true)
+                try {
+                  const res = await fetch("/api/geocode", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ area: selectedArea, block: blockNumber, street: streetNumber }),
+                  })
+                  const geoData = await res.json()
+                  if (geoData.lat) setCoords({ lat: geoData.lat, lng: geoData.lng })
+                } catch {}
+                setGeocoding(false)
+              }}
               disabled={geocoding || !selectedArea}
               style={{ background: geocoding ? "#DDDDDD" : "white", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
               className="w-full"
