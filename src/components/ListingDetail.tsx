@@ -23,8 +23,28 @@ type Listing = {
   description_ar: string | null
   description_en: string | null
   photos: string[]
+  amenities: string[]
   phone_number: string
 }
+
+const AMENITIES = [
+  { key: "furnished", en: "Furnished", ar: "مفروش" },
+  { key: "parking", en: "Parking", ar: "موقف سيارة" },
+  { key: "pool", en: "Pool", ar: "مسبح" },
+  { key: "gym", en: "Gym", ar: "صالة رياضية" },
+  { key: "balcony", en: "Balcony", ar: "شرفة" },
+  { key: "elevator", en: "Elevator", ar: "مصعد" },
+  { key: "security", en: "Security", ar: "حراسة" },
+  { key: "maid_room", en: "Maid's Room", ar: "غرفة خادمة" },
+  { key: "storage", en: "Storage", ar: "مستودع" },
+  { key: "central_ac", en: "Central A/C", ar: "تكييف مركزي" },
+  { key: "sea_view", en: "Sea View", ar: "إطلالة بحرية" },
+  { key: "bbq", en: "BBQ Area", ar: "منطقة شواء" },
+  { key: "garden", en: "Garden", ar: "حديقة" },
+  { key: "driver_room", en: "Driver's Room", ar: "غرفة سائق" },
+  { key: "internet", en: "Internet", ar: "إنترنت" },
+  { key: "solar", en: "Solar Panels", ar: "ألواح شمسية" },
+]
 
 const AREA_AR: Record<string, string> = {
   // Capital
@@ -201,6 +221,26 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
               <p style={{ fontSize: "15px", color: "#222", lineHeight: 1.7 }}>
                 {isAr ? (listing.description_ar || listing.description) : (listing.description_en || listing.description)}
               </p>
+            </div>
+          )}
+
+          {/* Amenities */}
+          {listing.amenities && listing.amenities.length > 0 && (
+            <div style={{ borderTop: "1px solid #EBEBEB" }} className="pt-5">
+              <p style={{ fontSize: "11px", color: "#717171", letterSpacing: "0.5px", fontWeight: 600 }} className="mb-3">
+                {isAr ? "المرافق والمميزات" : "AMENITIES"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {listing.amenities.map((key: string) => {
+                  const amenity = AMENITIES.find(a => a.key === key)
+                  if (!amenity) return null
+                  return (
+                    <span key={key} style={{ background: "#FFF0F2", color: "#FF385C", border: "1px solid #FFD6DF", borderRadius: "24px", padding: "6px 14px", fontSize: "13px", fontWeight: 500 }}>
+                      {isAr ? amenity.ar : amenity.en}
+                    </span>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>

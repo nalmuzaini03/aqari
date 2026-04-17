@@ -44,6 +44,25 @@ const PROPERTY_TYPE_LABELS: Record<string, { en: string; ar: string }> = {
   land: { en: "Land", ar: "أرض" },
 }
 
+const AMENITIES = [
+  { key: "furnished", en: "Furnished", ar: "مفروش" },
+  { key: "parking", en: "Parking", ar: "موقف سيارة" },
+  { key: "pool", en: "Pool", ar: "مسبح" },
+  { key: "gym", en: "Gym", ar: "صالة رياضية" },
+  { key: "balcony", en: "Balcony", ar: "شرفة" },
+  { key: "elevator", en: "Elevator", ar: "مصعد" },
+  { key: "security", en: "Security", ar: "حراسة" },
+  { key: "maid_room", en: "Maid's Room", ar: "غرفة خادمة" },
+  { key: "storage", en: "Storage", ar: "مستودع" },
+  { key: "central_ac", en: "Central A/C", ar: "تكييف مركزي" },
+  { key: "sea_view", en: "Sea View", ar: "إطلالة بحرية" },
+  { key: "bbq", en: "BBQ Area", ar: "منطقة شواء" },
+  { key: "garden", en: "Garden", ar: "حديقة" },
+  { key: "driver_room", en: "Driver's Room", ar: "غرفة سائق" },
+  { key: "internet", en: "Internet", ar: "إنترنت" },
+  { key: "solar", en: "Solar Panels", ar: "ألواح شمسية" },
+]
+
 export default function NewListingPage() {
   const router = useRouter()
   const supabaseBrowser = createClient()
@@ -62,6 +81,7 @@ export default function NewListingPage() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [geocoding, setGeocoding] = useState(false)
   const [selectedArea, setSelectedArea] = useState("")
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
 
   const LISTING_TYPES = [
     { value: "rent", label: isAr ? "للإيجار" : "For rent", desc: isAr ? "إيجار شهري" : "Monthly rental" },
@@ -75,6 +95,12 @@ export default function NewListingPage() {
       else setAuthed(true)
     })
   }, [])
+
+  function toggleAmenity(key: string) {
+    setSelectedAmenities(prev =>
+      prev.includes(key) ? prev.filter(a => a !== key) : [...prev, key]
+    )
+  }
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -104,7 +130,6 @@ export default function NewListingPage() {
     const photoUrls = await uploadPhotos(listingId)
     const { data: { session } } = await supabaseBrowser.auth.getSession()
 
-    // Auto-geocode on submit
     let finalCoords = coords
     if (!finalCoords && selectedArea) {
       try {
@@ -123,10 +148,8 @@ export default function NewListingPage() {
     const pricePerNight = listingType === "short_stay" ? Number(data.get("price_per_night")) : null
     const price = listingType === "short_stay" ? (pricePerNight ?? 0) : Number(data.get("price"))
 
-    // Auto-translate title and description
     const detectedLang = isAr ? "ar" : "en"
     const targetLang = isAr ? "en" : "ar"
-
     let title_ar = "", title_en = "", description_ar = "", description_en = ""
 
     try {
@@ -142,39 +165,25 @@ export default function NewListingPage() {
           body: JSON.stringify({ text: description, targetLang }),
         }) : Promise.resolve(null),
       ])
-
       const titleData = await titleRes.json()
       const descData = descRes ? await descRes.json() : { translated: "" }
-
       if (detectedLang === "ar") {
-        title_ar = title
-        title_en = titleData.translated
-        description_ar = description
-        description_en = descData.translated
+        title_ar = title; title_en = titleData.translated
+        description_ar = description; description_en = descData.translated
       } else {
-        title_en = title
-        title_ar = titleData.translated
-        description_en = description
-        description_ar = descData.translated
+        title_en = title; title_ar = titleData.translated
+        description_en = description; description_ar = descData.translated
       }
     } catch {
-      // If translation fails, just use original for both
-      title_ar = title
-      title_en = title
-      description_ar = description
-      description_en = description
+      title_ar = title; title_en = title
+      description_ar = description; description_en = description
     }
 
     const { error } = await supabase.from("property_listings").insert({
       id: listingId,
-      title,
-      title_ar,
-      title_en,
-      description,
-      description_ar,
-      description_en,
-      price,
-      price_per_night: pricePerNight,
+      title, title_ar, title_en,
+      description, description_ar, description_en,
+      price, price_per_night: pricePerNight,
       area: data.get("area"),
       block_number: blockNumber || null,
       street_number: streetNumber || null,
@@ -186,6 +195,7 @@ export default function NewListingPage() {
       property_type: data.get("property_type"),
       phone_number: data.get("phone_number"),
       listing_type: listingType,
+      amenities: selectedAmenities,
       photos: photoUrls,
       is_verified: false,
       user_id: session?.user.id ?? null,
@@ -206,15 +216,11 @@ export default function NewListingPage() {
 
   return (
     <div style={{ background: "white", minHeight: "100vh" }}>
-
-      {/* Nav */}
       <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="flex items-center justify-between px-6 sm:px-10 py-4">
         <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setLang(isAr ? "en" : "ar")}
-            style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}
-          >
+          <button onClick={() => setLang(isAr ? "en" : "ar")}
+            style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}>
             {isAr ? "English" : "العربية"}
           </button>
           <Link href="/listings" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", fontWeight: 500 }}>
@@ -225,7 +231,6 @@ export default function NewListingPage() {
 
       {authed && (
         <div className="max-w-2xl mx-auto px-4 py-10">
-
           <Link href="/listings" style={{ color: "#717171", fontSize: "14px", textDecoration: "none" }} className="flex items-center gap-1 mb-8">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -249,17 +254,8 @@ export default function NewListingPage() {
               <label style={labelStyle}>{tr.listingType}</label>
               <div className="grid grid-cols-3 gap-3">
                 {LISTING_TYPES.map(lt => (
-                  <button
-                    key={lt.value}
-                    type="button"
-                    onClick={() => setListingType(lt.value)}
-                    style={{
-                      border: listingType === lt.value ? "2px solid #FF385C" : "1px solid #DDDDDD",
-                      borderRadius: "12px", padding: "14px 10px",
-                      background: listingType === lt.value ? "#FFF0F2" : "white",
-                      cursor: "pointer", textAlign: "center",
-                    }}
-                  >
+                  <button key={lt.value} type="button" onClick={() => setListingType(lt.value)}
+                    style={{ border: listingType === lt.value ? "2px solid #FF385C" : "1px solid #DDDDDD", borderRadius: "12px", padding: "14px 10px", background: listingType === lt.value ? "#FFF0F2" : "white", cursor: "pointer", textAlign: "center" }}>
                     <p style={{ fontSize: "14px", fontWeight: 700, color: listingType === lt.value ? "#FF385C" : "#222", marginBottom: "2px" }}>{lt.label}</p>
                     <p style={{ fontSize: "11px", color: "#717171" }}>{lt.desc}</p>
                   </button>
@@ -306,14 +302,7 @@ export default function NewListingPage() {
             {/* Area */}
             <div>
               <label style={labelStyle}>{tr.areaLabel}</label>
-              <select
-                name="area"
-                required
-                value={selectedArea}
-                onChange={e => setSelectedArea(e.target.value)}
-                style={inputStyle}
-                className="focus:outline-none"
-              >
+              <select name="area" required value={selectedArea} onChange={e => setSelectedArea(e.target.value)} style={inputStyle} className="focus:outline-none">
                 <option value="">{tr.selectArea}</option>
                 {KUWAIT_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
@@ -323,70 +312,50 @@ export default function NewListingPage() {
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label style={labelStyle}>{isAr ? "رقم القطعة" : "BLOCK"}</label>
-                <input
-                  value={blockNumber}
-                  onChange={e => setBlockNumber(e.target.value)}
-                  placeholder={isAr ? "مثال: 5" : "e.g. 5"}
-                  style={inputStyle} className="focus:outline-none"
-                />
+                <input value={blockNumber} onChange={e => setBlockNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 5" : "e.g. 5"} style={inputStyle} className="focus:outline-none" />
               </div>
               <div>
                 <label style={labelStyle}>{isAr ? "رقم الشارع" : "STREET"}</label>
-                <input
-                  value={streetNumber}
-                  onChange={e => setStreetNumber(e.target.value)}
-                  placeholder={isAr ? "مثال: 12" : "e.g. 12"}
-                  style={inputStyle} className="focus:outline-none"
-                />
+                <input value={streetNumber} onChange={e => setStreetNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 12" : "e.g. 12"} style={inputStyle} className="focus:outline-none" />
               </div>
               <div>
                 <label style={labelStyle}>{isAr ? "الطابق" : "FLOOR"}</label>
-                <input
-                  value={floorNumber}
-                  onChange={e => setFloorNumber(e.target.value)}
-                  placeholder={isAr ? "مثال: 3" : "e.g. 3"}
-                  style={inputStyle} className="focus:outline-none"
-                />
+                <input value={floorNumber} onChange={e => setFloorNumber(e.target.value)}
+                  placeholder={isAr ? "مثال: 3" : "e.g. 3"} style={inputStyle} className="focus:outline-none" />
               </div>
             </div>
 
             {/* Map preview */}
             {coords && (
-              <div style={{ border: "1px solid #EBEBEB", borderRadius: "12px", overflow: "hidden", height: "200px" }}>
-                <iframe
-                  width="100%"
-                  height="200"
-                  style={{ border: 0 }}
-                  src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
-                />
+              <div style={{ border: "1px solid #EBEBEB", borderRadius: "12px", overflow: "hidden" }}>
+                <iframe width="100%" height="200" style={{ border: 0 }}
+                  src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`} />
               </div>
             )}
 
-            {/* Locate button */}
-            <button
-              type="button"
-              onClick={async () => {
-                if (!selectedArea) return
-                setGeocoding(true)
-                try {
-                  const res = await fetch("/api/geocode", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ area: selectedArea, block: blockNumber, street: streetNumber }),
-                  })
-                  const geoData = await res.json()
-                  if (geoData.lat) setCoords({ lat: geoData.lat, lng: geoData.lng })
-                } catch {}
-                setGeocoding(false)
-              }}
-              disabled={geocoding || !selectedArea}
+            {/* Preview location button */}
+            <button type="button" onClick={async () => {
+              if (!selectedArea) return
+              setGeocoding(true)
+              try {
+                const res = await fetch("/api/geocode", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ area: selectedArea, block: blockNumber, street: streetNumber }),
+                })
+                const geoData = await res.json()
+                if (geoData.lat) setCoords({ lat: geoData.lat, lng: geoData.lng })
+              } catch {}
+              setGeocoding(false)
+            }} disabled={geocoding || !selectedArea}
               style={{ background: geocoding ? "#DDDDDD" : "white", color: "#222", border: "1px solid #DDDDDD", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
-              className="w-full"
-            >
+              className="w-full">
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"/>
               </svg>
-              {geocoding ? (isAr ? "جاري تحديد الموقع..." : "Locating...") : (isAr ? "تحديد الموقع على الخريطة" : "Preview location on map")}
+              {geocoding ? (isAr ? "جاري تحديد الموقع..." : "Locating...") : (isAr ? "معاينة الموقع على الخريطة" : "Preview location on map")}
             </button>
 
             {/* Property type */}
@@ -440,6 +409,35 @@ export default function NewListingPage() {
                 </select>
               </div>
             )}
+
+            {/* Amenities */}
+            <div>
+              <label style={labelStyle}>{isAr ? "المرافق والمميزات" : "AMENITIES"}</label>
+              <div className="flex flex-wrap gap-2">
+                {AMENITIES.map(a => {
+                  const selected = selectedAmenities.includes(a.key)
+                  return (
+                    <button
+                      key={a.key}
+                      type="button"
+                      onClick={() => toggleAmenity(a.key)}
+                      style={{
+                        border: selected ? "2px solid #FF385C" : "1px solid #DDDDDD",
+                        borderRadius: "24px",
+                        padding: "8px 16px",
+                        fontSize: "13px",
+                        fontWeight: selected ? 700 : 400,
+                        color: selected ? "#FF385C" : "#717171",
+                        background: selected ? "#FFF0F2" : "white",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {isAr ? a.ar : a.en}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
 
             {/* Phone */}
             <div>
