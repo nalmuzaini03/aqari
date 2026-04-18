@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useLang } from "@/lib/language-context"
 import { t } from "@/lib/translations"
 import DeleteButton from "@/components/DeleteButton"
@@ -85,6 +85,18 @@ function PhotoGallery({ photos, title }: { photos: string[], title: string }) {
   const [current, setCurrent] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
 
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lbZoom, setLbZoom] = useState(1)
+  const [panX, setPanX] = useState(0)
+  const [panY, setPanY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const lightboxRef = useRef<HTMLDivElement>(null)
+  const dragStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null)
+  const swipeTouchStartRef = useRef<number | null>(null)
+  const pinchStartDistRef = useRef<number | null>(null)
+  const pinchStartZoomRef = useRef(1)
+
   function prev() { setCurrent(i => (i - 1 + photos.length) % photos.length) }
   function next() { setCurrent(i => (i + 1) % photos.length) }
 
@@ -99,81 +111,254 @@ function PhotoGallery({ photos, title }: { photos: string[], title: string }) {
     setTouchStart(null)
   }
 
+  const resetView = () => { setLbZoom(1); setPanX(0); setPanY(0) }
+
+  const openLightbox = () => { setLightboxOpen(true); resetView() }
+  const closeLightbox = () => { setLightboxOpen(false); resetView() }
+
+  const lbNext = () => { setCurrent(i => (i + 1) % photos.length); resetView() }
+  const lbPrev = () => { setCurrent(i => (i - 1 + photos.length) % photos.length); resetView() }
+
+  // Keyboard + body scroll lock
+  useEffect(() => {
+    if (!lightboxOpen) return
+    document.body.style.overflow = "hidden"
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox()
+      else if (e.key === "ArrowRight") { setCurrent(i => (i + 1) % photos.length); resetView() }
+      else if (e.key === "ArrowLeft") { setCurrent(i => (i - 1 + photos.length) % photos.length); resetView() }
+    }
+    window.addEventListener("keydown", handler)
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", handler) }
+  }, [lightboxOpen, photos.length])
+
+  // Non-passive wheel + touchmove to prevent page scroll inside lightbox
+  useEffect(() => {
+    const el = lightboxRef.current
+    if (!el) return
+    const stopWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      setLbZoom(z => {
+        const next = Math.min(5, Math.max(1, z * (1 - e.deltaY * 0.002)))
+        if (next <= 1) { setPanX(0); setPanY(0) }
+        return next
+      })
+    }
+    const stopTouchMove = (e: TouchEvent) => e.preventDefault()
+    el.addEventListener("wheel", stopWheel, { passive: false })
+    el.addEventListener("touchmove", stopTouchMove, { passive: false })
+    return () => { el.removeEventListener("wheel", stopWheel); el.removeEventListener("touchmove", stopTouchMove) }
+  }, [lightboxOpen])
+
+  // Mouse drag handlers
+  const onLbMouseDown = (e: React.MouseEvent) => {
+    if (lbZoom <= 1) return
+    setIsDragging(true)
+    dragStartRef.current = { x: e.clientX, y: e.clientY, panX, panY }
+  }
+  const onLbMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !dragStartRef.current) return
+    setPanX(dragStartRef.current.panX + (e.clientX - dragStartRef.current.x))
+    setPanY(dragStartRef.current.panY + (e.clientY - dragStartRef.current.y))
+  }
+  const onLbMouseUp = () => { setIsDragging(false); dragStartRef.current = null }
+
+  // Double click to toggle zoom
+  const onLbDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lbZoom > 1) { resetView() } else { setLbZoom(2.5) }
+  }
+
+  // Touch: pinch zoom + swipe navigation
+  const onLbTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      pinchStartDistRef.current = Math.sqrt(dx * dx + dy * dy)
+      pinchStartZoomRef.current = lbZoom
+    } else if (e.touches.length === 1) {
+      swipeTouchStartRef.current = e.touches[0].clientX
+      if (lbZoom > 1) dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, panX, panY }
+    }
+  }
+  const onLbTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStartDistRef.current !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const newZoom = Math.min(5, Math.max(1, pinchStartZoomRef.current * (dist / pinchStartDistRef.current)))
+      setLbZoom(newZoom)
+      if (newZoom <= 1) { setPanX(0); setPanY(0) }
+    } else if (e.touches.length === 1 && dragStartRef.current && lbZoom > 1) {
+      setPanX(dragStartRef.current.panX + (e.touches[0].clientX - dragStartRef.current.x))
+      setPanY(dragStartRef.current.panY + (e.touches[0].clientY - dragStartRef.current.y))
+    }
+  }
+  const onLbTouchEnd = (e: React.TouchEvent) => {
+    pinchStartDistRef.current = null
+    if (lbZoom <= 1 && swipeTouchStartRef.current !== null && e.changedTouches.length > 0) {
+      const dx = e.changedTouches[0].clientX - swipeTouchStartRef.current
+      if (Math.abs(dx) > 50) { if (dx < 0) lbNext(); else lbPrev() }
+    }
+    swipeTouchStartRef.current = null
+    dragStartRef.current = null
+  }
+
   if (photos.length === 1) {
     return (
-      <div style={{ borderRadius: "16px", overflow: "hidden", marginBottom: "24px" }}>
-        <img src={photos[0]} alt={title} className="w-full object-cover" style={{ height: "320px" }} />
-      </div>
+      <>
+        <div style={{ borderRadius: "16px", overflow: "hidden", marginBottom: "24px", cursor: "zoom-in" }} onClick={openLightbox}>
+          <img src={photos[0]} alt={title} className="w-full object-cover" style={{ height: "320px" }} />
+        </div>
+
+        {lightboxOpen && (
+          <div ref={lightboxRef} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.96)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <button onClick={closeLightbox} style={{ position: "absolute", top: "16px", right: "16px", background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "50%", width: "44px", height: "44px", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div
+              style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", cursor: lbZoom > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in" }}
+              onMouseDown={onLbMouseDown} onMouseMove={onLbMouseMove} onMouseUp={onLbMouseUp} onMouseLeave={onLbMouseUp}
+              onTouchStart={onLbTouchStart} onTouchMove={onLbTouchMove} onTouchEnd={onLbTouchEnd}
+              onDoubleClick={onLbDoubleClick}
+            >
+              <img src={photos[0]} alt={title} draggable={false} style={{ maxWidth: "92vw", maxHeight: "92vh", objectFit: "contain", transform: `translate(${panX}px, ${panY}px) scale(${lbZoom})`, transition: isDragging ? "none" : "transform 0.15s ease", userSelect: "none", pointerEvents: "none", display: "block" }} />
+            </div>
+            {lbZoom > 1 && <div style={{ position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", color: "rgba(255,255,255,0.8)", fontSize: "12px", background: "rgba(0,0,0,0.5)", padding: "4px 12px", borderRadius: "12px", userSelect: "none" }}>{Math.round(lbZoom * 100)}%</div>}
+          </div>
+        )}
+      </>
     )
   }
 
   return (
-    <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", marginBottom: "24px" }}>
-      {/* Main image */}
-      <div
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        style={{ position: "relative", height: "320px", background: "#F7F7F7" }}
-      >
-        <img
-          src={photos[current]}
-          alt={`${title} ${current + 1}`}
-          className="w-full h-full object-cover"
-          style={{ transition: "opacity 0.2s" }}
-        />
+    <>
+      <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", marginBottom: "24px" }}>
+        {/* Main image */}
+        <div
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          style={{ position: "relative", height: "320px", background: "#F7F7F7", cursor: "zoom-in" }}
+          onClick={openLightbox}
+        >
+          <img
+            src={photos[current]}
+            alt={`${title} ${current + 1}`}
+            className="w-full h-full object-cover"
+            style={{ transition: "opacity 0.2s", pointerEvents: "none" }}
+          />
 
-        {/* Counter */}
-        <div style={{ position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "12px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px" }}>
-          {current + 1} / {photos.length}
+          {/* Counter */}
+          <div style={{ position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "12px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px" }}>
+            {current + 1} / {photos.length}
+          </div>
+
+          {/* Left arrow */}
+          <button
+            onClick={e => { e.stopPropagation(); prev() }}
+            style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+          >
+            <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+
+          {/* Right arrow */}
+          <button
+            onClick={e => { e.stopPropagation(); next() }}
+            style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+          >
+            <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
 
-        {/* Left arrow */}
-        <button
-          onClick={prev}
-          style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
-        >
-          <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
-          </svg>
-        </button>
-
-        {/* Right arrow */}
-        <button
-          onClick={next}
-          style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
-        >
-          <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
-        </button>
-      </div>
-
-      {/* Dot indicators */}
-      <div style={{ display: "flex", justifyContent: "center", gap: "6px", padding: "12px 0", background: "white" }}>
-        {photos.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            style={{ width: i === current ? "20px" : "8px", height: "8px", borderRadius: "99px", background: i === current ? "#FF385C" : "#DDDDDD", border: "none", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
-          />
-        ))}
-      </div>
-
-      {/* Thumbnail strip */}
-      {photos.length > 1 && (
-        <div style={{ display: "flex", gap: "6px", padding: "0 0 12px", overflowX: "auto", scrollbarWidth: "none" }}>
-          {photos.map((url, i) => (
+        {/* Dot indicators */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "6px", padding: "12px 0", background: "white" }}>
+          {photos.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              style={{ flexShrink: 0, width: "72px", height: "56px", borderRadius: "8px", overflow: "hidden", border: i === current ? "2px solid #FF385C" : "2px solid transparent", padding: 0, cursor: "pointer" }}
-            >
-              <img src={url} alt={`thumb ${i}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </button>
+              style={{ width: i === current ? "20px" : "8px", height: "8px", borderRadius: "99px", background: i === current ? "#FF385C" : "#DDDDDD", border: "none", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
+            />
           ))}
         </div>
+
+        {/* Thumbnail strip */}
+        {photos.length > 1 && (
+          <div style={{ display: "flex", gap: "6px", padding: "0 0 12px", overflowX: "auto", scrollbarWidth: "none" }}>
+            {photos.map((url, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                style={{ flexShrink: 0, width: "72px", height: "56px", borderRadius: "8px", overflow: "hidden", border: i === current ? "2px solid #FF385C" : "2px solid transparent", padding: 0, cursor: "pointer" }}
+              >
+                <img src={url} alt={`thumb ${i}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          ref={lightboxRef}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.96)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={e => { if (e.target === e.currentTarget) closeLightbox() }}
+        >
+          {/* Close */}
+          <button onClick={closeLightbox} style={{ position: "absolute", top: "16px", right: "16px", background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "50%", width: "44px", height: "44px", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+
+          {/* Counter */}
+          <div style={{ position: "absolute", top: "16px", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "13px", fontWeight: 600, background: "rgba(0,0,0,0.5)", padding: "4px 14px", borderRadius: "20px", userSelect: "none", whiteSpace: "nowrap" }}>
+            {current + 1} / {photos.length}
+          </div>
+
+          {/* Prev */}
+          <button onClick={lbPrev} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "50%", width: "48px", height: "48px", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+
+          {/* Next */}
+          <button onClick={lbNext} style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "50%", width: "48px", height: "48px", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          {/* Image area */}
+          <div
+            style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", cursor: lbZoom > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in" }}
+            onMouseDown={onLbMouseDown} onMouseMove={onLbMouseMove} onMouseUp={onLbMouseUp} onMouseLeave={onLbMouseUp}
+            onTouchStart={onLbTouchStart} onTouchMove={onLbTouchMove} onTouchEnd={onLbTouchEnd}
+            onDoubleClick={onLbDoubleClick}
+          >
+            <img
+              src={photos[current]}
+              alt={`${title} ${current + 1}`}
+              draggable={false}
+              style={{
+                maxWidth: "92vw",
+                maxHeight: "92vh",
+                objectFit: "contain",
+                transform: `translate(${panX}px, ${panY}px) scale(${lbZoom})`,
+                transition: isDragging ? "none" : "transform 0.15s ease",
+                userSelect: "none",
+                pointerEvents: "none",
+                display: "block",
+              }}
+            />
+          </div>
+
+          {/* Zoom % + hint */}
+          <div style={{ position: "absolute", bottom: "20px", left: "50%", transform: "translateX(-50%)", color: "rgba(255,255,255,0.6)", fontSize: "12px", background: "rgba(0,0,0,0.4)", padding: "5px 14px", borderRadius: "12px", userSelect: "none", whiteSpace: "nowrap" }}>
+            {lbZoom > 1 ? `${Math.round(lbZoom * 100)}%` : "scroll or pinch to zoom · double-click to zoom"}
+          </div>
+        </div>
       )}
-    </div>
+    </>
   )
 }
 
