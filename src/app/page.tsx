@@ -137,7 +137,7 @@ export default function HomePage() {
     )
     document.querySelectorAll("[data-fade]").forEach(el => observer.observe(el))
     return () => observer.disconnect()
-  }, [activeGov])
+  }, [activeGov, listings, listingTab])
 
   function handleSearch() {
     const params = new URLSearchParams()
@@ -295,9 +295,9 @@ export default function HomePage() {
         <section style={{ background: "#F5F5F7", padding: "48px 40px" }}>
           <div style={{ maxWidth: "800px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0", textAlign: "center" }}>
             {[
-              { num: "100+", label: isAr ? "منطقة في الكويت" : "Areas in Kuwait" },
-              { num: isAr ? "مجانًا" : "Free", label: isAr ? "نشر إعلانك" : "To post a listing" },
-              { num: "2", label: isAr ? "لغة كاملة" : "Full languages" },
+              { num: isAr ? "مجاني" : "Free", label: isAr ? "نشر إعلانك بالكامل" : "To post your listing" },
+              { num: isAr ? "مباشر" : "Direct", label: isAr ? "تواصل مع المالك مباشرة" : "Contact the owner directly" },
+              { num: isAr ? "موثّق" : "Verified", label: isAr ? "إعلانات مراجعة يدوياً" : "Listings reviewed by us" },
             ].map((s, i) => (
               <div key={s.label} data-fade data-d={String(i + 1)} style={{ padding: "8px 24px", borderRight: i < 2 ? "1px solid #DADADD" : "none" }}>
                 <div style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 800, color: "#1d1d1f", letterSpacing: "-1px" }}>{s.num}</div>
