@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { useState } from "react"
 import { useLang } from "@/lib/language-context"
 import { t } from "@/lib/translations"
 import DeleteButton from "@/components/DeleteButton"
@@ -48,7 +49,6 @@ const AMENITIES = [
 ]
 
 const AREA_AR: Record<string, string> = {
-  // Capital
   "Abdulla Al-Salem": "عبدالله السالم", "Adailiya": "العدلية", "Bnaid Al-Qar": "بنيد القار",
   "Daiya": "الدعية", "Dasma": "الدسمة", "Doha": "الدوحة",
   "Faiha": "الفيحاء", "Granada": "غرناطة", "Jibla": "جبلة",
@@ -57,34 +57,124 @@ const AREA_AR: Record<string, string> = {
   "Qadsiya": "القادسية", "Qortuba": "قرطبة", "Rawda": "الروضة",
   "Shamiya": "الشامية", "Sharq": "شرق", "Shuwaikh": "الشويخ",
   "Sulaibikhat": "الصليبخات", "Qairawan": "القيروان", "Surra": "السرة",
-  "Yarmouk": "اليرموك",
-  // Hawalli
-  "Anjafa": "العنجفة", "Bayan": "بيان", "Bidaa": "البدع",
+  "Yarmouk": "اليرموك", "Anjafa": "العنجفة", "Bayan": "بيان", "Bidaa": "البدع",
   "Hawalli": "حولي", "Hitteen": "حطين", "Jabriya": "الجابرية",
   "Mishrif": "مشرف", "Mubarak Al-Abdullah": "مبارك العبدالله", "Rumaithiya": "الرميثية",
   "Salam": "السلام", "Salmiya": "السالمية", "Salwa": "سلوى",
   "Shaab": "الشعب", "Shuhada": "الشهداء", "Siddiq": "الصديق", "Zahra": "الزهراء",
-  // Farwaniya
   "Abdullah Al-Mubarak": "عبدالله المبارك", "Abraq Khaitan": "أبرق خيطان",
   "Andalus": "الأندلس", "Ardiya": "العارضية", "Ashbeliah": "إشبيلية",
   "Dajeej": "الدجيج", "Farwaniya": "الفروانية", "Jleeb Al-Shuyoukh": "جليب الشيوخ",
   "Khaitan": "خيطان", "Omariya": "العمرية", "Qurain": "القرين",
   "Rai": "الري", "Rehab": "الرحاب", "Riggae": "الرقعي", "Sabah Al-Nasser": "صباح الناصر",
-  // Ahmadi
   "Abu Halifa": "أبو حليفة", "Ahmadi": "الأحمدي", "Ali Sabah Al-Salem": "علي صباح السالم",
   "Bnaider": "البنيدر", "Fahaheel": "الفحيحيل", "Fintas": "الفنطاس",
   "Funaitis": "الفنيطيس", "Hadiya": "هدية", "Khiran": "الخيران",
   "Mahboula": "المهبولة", "Mangaf": "المنقف", "Nuwaiseeb": "النويصيب",
   "Riqqa": "الرقة", "Sabahiya": "الصباحية", "Sabah Al-Ahmed Sea City": "مدينة صباح الأحمد البحرية",
   "Shuaiba": "الشعيبة", "Wafra": "الوفرة", "Zour": "الزور",
-  // Jahra
   "Amghara": "أمغرة", "Jahra": "الجهراء", "Mutlaa": "المطلاع",
   "Naeem": "النعيم", "Naseem": "النسيم", "Oyoun": "العيون",
   "Qasr": "القصر", "Saad Al-Abdullah": "سعد العبدالله", "Sulaibiya": "الصليبية", "Taima": "تيماء",
-  // Mubarak Al-Kabeer
   "Abu Al Hasaniya": "أبو الحصانية", "Abu Ftaira": "أبو فطيرة", "Adan": "عدان",
   "Fnaitees": "الفنيطيس", "Masayel": "المسايل", "Messila": "المسيلة",
   "Mubarak Al-Kabeer": "مبارك الكبير", "Qusour": "القصور", "Sabah Al-Salem": "صباح السالم",
+}
+
+function PhotoGallery({ photos, title }: { photos: string[], title: string }) {
+  const [current, setCurrent] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+
+  function prev() { setCurrent(i => (i - 1 + photos.length) % photos.length) }
+  function next() { setCurrent(i => (i + 1) % photos.length) }
+
+  function onTouchStart(e: React.TouchEvent) {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchStart === null) return
+    const diff = touchStart - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) diff > 0 ? next() : prev()
+    setTouchStart(null)
+  }
+
+  if (photos.length === 1) {
+    return (
+      <div style={{ borderRadius: "16px", overflow: "hidden", marginBottom: "24px" }}>
+        <img src={photos[0]} alt={title} className="w-full object-cover" style={{ height: "320px" }} />
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", marginBottom: "24px" }}>
+      {/* Main image */}
+      <div
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        style={{ position: "relative", height: "320px", background: "#F7F7F7" }}
+      >
+        <img
+          src={photos[current]}
+          alt={`${title} ${current + 1}`}
+          className="w-full h-full object-cover"
+          style={{ transition: "opacity 0.2s" }}
+        />
+
+        {/* Counter */}
+        <div style={{ position: "absolute", top: "12px", right: "12px", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "12px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px" }}>
+          {current + 1} / {photos.length}
+        </div>
+
+        {/* Left arrow */}
+        <button
+          onClick={prev}
+          style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+        >
+          <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        {/* Right arrow */}
+        <button
+          onClick={next}
+          style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "white", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+        >
+          <svg width="16" height="16" fill="none" stroke="#222" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Dot indicators */}
+      <div style={{ display: "flex", justifyContent: "center", gap: "6px", padding: "12px 0", background: "white" }}>
+        {photos.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            style={{ width: i === current ? "20px" : "8px", height: "8px", borderRadius: "99px", background: i === current ? "#FF385C" : "#DDDDDD", border: "none", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
+          />
+        ))}
+      </div>
+
+      {/* Thumbnail strip */}
+      {photos.length > 1 && (
+        <div style={{ display: "flex", gap: "6px", padding: "0 0 12px", overflowX: "auto", scrollbarWidth: "none" }}>
+          {photos.map((url, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              style={{ flexShrink: 0, width: "72px", height: "56px", borderRadius: "8px", overflow: "hidden", border: i === current ? "2px solid #FF385C" : "2px solid transparent", padding: 0, cursor: "pointer" }}
+            >
+              <img src={url} alt={`thumb ${i}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function ListingDetail({ listing }: { listing: Listing }) {
@@ -111,10 +201,8 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
       <nav style={{ background: "white", borderBottom: "1px solid #EBEBEB" }} className="flex items-center justify-between px-6 sm:px-10 py-4">
         <Link href="/" style={{ fontSize: "22px", fontWeight: 800, color: "#FF385C", letterSpacing: "-0.5px", textDecoration: "none" }}>aqari</Link>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setLang(isAr ? "en" : "ar")}
-            style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}
-          >
+          <button onClick={() => setLang(isAr ? "en" : "ar")}
+            style={{ fontSize: "13px", color: "#222", border: "1px solid #DDDDDD", padding: "7px 14px", borderRadius: "24px", background: "white", fontWeight: 600, cursor: "pointer" }}>
             {isAr ? "English" : "العربية"}
           </button>
           <Link href="/listings" style={{ fontSize: "14px", color: "#222", border: "1px solid #DDDDDD", padding: "8px 20px", borderRadius: "24px", fontWeight: 500 }}>
@@ -136,13 +224,9 @@ export default function ListingDetail({ listing }: { listing: Listing }) {
           <DeleteButton listingId={listing.id} />
         </div>
 
-        {/* Photos */}
+        {/* Photo Gallery */}
         {listing.photos && listing.photos.length > 0 ? (
-          <div className={`grid gap-2 mb-6 overflow-hidden ${listing.photos.length === 1 ? "grid-cols-1" : "grid-cols-2"}`} style={{ borderRadius: "16px" }}>
-            {listing.photos.slice(0, 6).map((url: string, i: number) => (
-              <img key={i} src={url} alt={listing.title} className={`w-full object-cover ${listing.photos.length === 1 ? "h-80" : "h-52"}`} />
-            ))}
-          </div>
+          <PhotoGallery photos={listing.photos} title={listing.title} />
         ) : (
           <div style={{ background: "#F7F7F7", border: "1px solid #EBEBEB", borderRadius: "16px" }} className="w-full h-56 flex items-center justify-center mb-6">
             <svg className="w-12 h-12" style={{ color: "#DDDDDD" }} fill="currentColor" viewBox="0 0 24 24">
